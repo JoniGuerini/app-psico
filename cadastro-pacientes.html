@@ -1,0 +1,3604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Pacientes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --creme: #f5efe0;
+      --creme-claro: #faf6ec;
+      --creme-escuro: #ebe2cd;
+      --fundo: #efe7d5;
+      --azul-escuro: #1b3a5c;
+      --azul-medio: #2c5282;
+      --azul-suave: #e6ecf3;
+      --verde-claro: #a8d5ba;
+      --verde-medio: #7fb99b;
+      --verde-suave: #e8f3ec;
+      --texto: #2a2a2a;
+      --texto-suave: #6b6b6b;
+      --texto-claro: #9a9a9a;
+      --erro: #b94a4a;
+      --erro-suave: #f5e4e4;
+      --borda: rgba(27, 58, 92, 0.14);
+      --borda-suave: rgba(27, 58, 92, 0.08);
+      --sombra: 0 4px 16px rgba(27, 58, 92, 0.06);
+      --sombra-forte: 0 8px 28px rgba(27, 58, 92, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      font-family: "Manrope", system-ui, sans-serif;
+      background: var(--fundo);
+      color: var(--texto);
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      background: var(--azul-escuro);
+      color: var(--creme);
+      padding: 16px 0;
+      box-shadow: var(--sombra);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      background: var(--verde-claro);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--azul-escuro);
+      font-weight: 700;
+      font-size: 20px;
+      font-family: "Fraunces", serif;
+    }
+
+    h1 {
+      font-family: "Fraunces", serif;
+      font-weight: 500;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--verde-claro);
+      opacity: 0.85;
+    }
+
+    /* ===== MAIN ===== */
+    main {
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 0 24px 48px;
+    }
+
+    /* ===== NAV (no header) ===== */
+    .main-nav {
+      display: flex;
+      gap: 4px;
+      margin-left: auto;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 9px 16px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: rgba(245, 239, 224, 0.78);
+      border-radius: 9px;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover {
+      color: var(--creme);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-link.active {
+      background: var(--verde-claro);
+      color: var(--azul-escuro);
+    }
+
+    .nav-count {
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.14);
+      color: var(--creme);
+      padding: 1px 7px;
+      border-radius: 99px;
+      min-width: 18px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .nav-link.active .nav-count {
+      background: rgba(27, 58, 92, 0.18);
+      color: var(--azul-escuro);
+    }
+
+    .nav-action {
+      background: var(--verde-claro);
+      color: var(--azul-escuro);
+      border: none;
+      border-radius: 9px;
+      padding: 6px 14px;
+      margin-left: 8px;
+      font-family: "Fraunces", serif;
+      font-size: 22px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      height: 36px;
+    }
+
+    .nav-action:hover {
+      background: var(--verde-medio);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .nav-action.active {
+      background: var(--verde-medio);
+      color: white;
+    }
+
+    @media (max-width: 720px) {
+      header {
+        position: static;
+      }
+      .header-inner {
+        gap: 14px;
+      }
+      .main-nav {
+        width: 100%;
+        margin-left: 0;
+        justify-content: center;
+      }
+      .header-sub {
+        display: none;
+      }
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--creme-claro);
+      border-radius: 16px;
+      padding: 32px;
+      border: 1px solid var(--borda-suave);
+      box-shadow: var(--sombra);
+    }
+
+    .card-header {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--borda-suave);
+    }
+
+    .card-header:has(.card-header-actions) {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .card-header-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-header h2 {
+      font-family: "Fraunces", serif;
+      font-weight: 500;
+      font-size: 22px;
+      color: var(--azul-escuro);
+      letter-spacing: -0.01em;
+    }
+
+    .card-header p {
+      font-size: 14px;
+      color: var(--texto-suave);
+      margin-top: 4px;
+    }
+
+    .card-header-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ===== FORM ===== */
+    .form-section {
+      margin-bottom: 28px;
+    }
+
+    .form-section h3 {
+      font-family: "Fraunces", serif;
+      font-weight: 500;
+      font-size: 16px;
+      color: var(--azul-escuro);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-section h3::before {
+      content: "";
+      width: 4px;
+      height: 16px;
+      background: var(--verde-claro);
+      border-radius: 2px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .col-1  { grid-column: span 1; }
+    .col-2  { grid-column: span 2; }
+    .col-3  { grid-column: span 3; }
+    .col-4  { grid-column: span 4; }
+    .col-5  { grid-column: span 5; }
+    .col-6  { grid-column: span 6; }
+    .col-7  { grid-column: span 7; }
+    .col-8  { grid-column: span 8; }
+    .col-9  { grid-column: span 9; }
+    .col-10 { grid-column: span 10; }
+    .col-11 { grid-column: span 11; }
+    .col-12 { grid-column: span 12; }
+
+    @media (max-width: 720px) {
+      [class*="col-"] {
+        grid-column: span 12;
+      }
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--azul-escuro);
+    }
+
+    label .req {
+      color: var(--erro);
+      margin-left: 2px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    select,
+    textarea {
+      font-family: inherit;
+      font-size: 14px;
+      padding: 11px 14px;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      background: white;
+      color: var(--texto);
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--azul-medio);
+      box-shadow: 0 0 0 3px var(--azul-suave);
+    }
+
+    input.invalid,
+    select.invalid {
+      border-color: var(--erro);
+      background: var(--erro-suave);
+    }
+
+    .field-error {
+      font-size: 12px;
+      color: var(--erro);
+      min-height: 14px;
+    }
+
+    .cep-status {
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 6px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      display: none;
+      vertical-align: middle;
+    }
+    .cep-status.show { display: inline-block; }
+    .cep-status.loading {
+      background: var(--azul-suave);
+      color: var(--azul-escuro);
+    }
+    .cep-status.success {
+      background: var(--verde-suave);
+      color: #2d6a4a;
+    }
+    .cep-status.error {
+      background: var(--erro-suave);
+      color: var(--erro);
+    }
+    .cep-status.loading::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border: 2px solid var(--azul-escuro);
+      border-top-color: transparent;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: -1px;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .field input.cep-found {
+      border-color: var(--verde-medio);
+      background: var(--verde-suave);
+    }
+
+    /* ===== INPUT WITH PREFIX (R$) ===== */
+    .input-prefix {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-prefix .prefix {
+      position: absolute;
+      left: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--texto-suave);
+      pointer-events: none;
+    }
+    .input-prefix input {
+      padding-left: 36px;
+    }
+
+    /* ===== PROFILE PAGE ===== */
+    .profile-header {
+      background: var(--azul-escuro);
+      color: var(--creme);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      box-shadow: var(--sombra);
+    }
+
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background: var(--verde-claro);
+      color: var(--azul-escuro);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Fraunces", serif;
+      font-weight: 600;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .profile-identity {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .profile-identity h2 {
+      font-family: "Fraunces", serif;
+      font-weight: 500;
+      font-size: 28px;
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+    }
+
+    .profile-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 13px;
+      color: var(--verde-claro);
+      opacity: 0.9;
+    }
+
+    .profile-tags .badge {
+      border: none;
+    }
+
+    .profile-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .profile-actions .btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--creme);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .profile-actions .btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    .profile-actions .btn.btn-accent {
+      background: var(--verde-claro);
+      color: var(--azul-escuro);
+      border-color: var(--verde-claro);
+    }
+    .profile-actions .btn.btn-accent:hover {
+      background: var(--verde-medio);
+      color: white;
+    }
+    .profile-actions .btn.btn-danger-light {
+      background: rgba(185, 74, 74, 0.2);
+      color: #fbb;
+      border-color: rgba(185, 74, 74, 0.4);
+    }
+    .profile-actions .btn.btn-danger-light:hover {
+      background: var(--erro);
+      color: white;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 720px) {
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+
+    .profile-section {
+      background: var(--creme-claro);
+      border: 1px solid var(--borda-suave);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .profile-section.full {
+      grid-column: 1 / -1;
+    }
+
+    .profile-section h3 {
+      font-family: "Fraunces", serif;
+      font-weight: 500;
+      font-size: 16px;
+      color: var(--azul-escuro);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--borda-suave);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile-section h3::before {
+      content: "";
+      width: 4px;
+      height: 16px;
+      background: var(--verde-claro);
+      border-radius: 2px;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 12px;
+      padding: 8px 0;
+      font-size: 14px;
+      align-items: baseline;
+    }
+    .info-row + .info-row {
+      border-top: 1px solid var(--borda-suave);
+    }
+    .info-row .info-label {
+      color: var(--texto-suave);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .info-row .info-value {
+      color: var(--texto);
+      word-break: break-word;
+    }
+    .info-row .info-value.empty {
+      color: var(--texto-claro);
+      font-style: italic;
+    }
+    .info-row .info-value.highlight {
+      color: var(--azul-escuro);
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .info-row .info-value.currency {
+      font-family: "Fraunces", serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--azul-escuro);
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      color: var(--azul-escuro);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 16px;
+      padding: 6px 0;
+    }
+    .back-btn:hover {
+      color: var(--azul-medio);
+    }
+    .back-btn::before {
+      content: "←";
+      font-size: 18px;
+    }
+
+    /* ===== AGENDAMENTOS REPEATER (form) ===== */
+    .agendamentos-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .agendamento-row {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+      padding: 14px;
+      background: white;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+    }
+    @media (max-width: 720px) {
+      .agendamento-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      .agendamento-row .remove-row { grid-column: 1 / -1; }
+    }
+    .agendamento-row label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--texto-suave);
+      margin-bottom: 4px;
+      display: block;
+    }
+    .agendamento-row .remove-row {
+      background: transparent;
+      border: 1px solid var(--erro);
+      color: var(--erro);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      height: 41px;
+      align-self: end;
+      transition: all 0.15s ease;
+    }
+    .agendamento-row .remove-row:hover {
+      background: var(--erro-suave);
+    }
+    .agendamento-empty {
+      padding: 20px;
+      text-align: center;
+      color: var(--texto-suave);
+      background: var(--creme);
+      border: 1px dashed var(--borda);
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    /* ===== MODALIDADE COLORS ===== */
+    /* Faixa lateral colorida SOMENTE nos eventos do calendário */
+    .cal-event.mod-presencial {
+      background: var(--verde-suave);
+      border-left: 4px solid var(--verde-medio);
+    }
+    .cal-event.mod-remoto {
+      background: var(--azul-suave);
+      border-left: 4px solid var(--azul-medio);
+    }
+    .cal-event.mod-hibrido {
+      background: #f5e8d4;
+      border-left: 4px solid #c89c5e;
+    }
+
+    /* Badge de modalidade no perfil (só cor, sem faixa) */
+    .badge.mod-presencial {
+      color: #2d6a4a;
+      border: 1px solid var(--verde-medio);
+      background: var(--verde-suave);
+    }
+    .badge.mod-remoto {
+      color: var(--azul-escuro);
+      border: 1px solid var(--azul-medio);
+      background: var(--azul-suave);
+    }
+    .badge.mod-hibrido {
+      color: #7a5520;
+      border: 1px solid #c89c5e;
+      background: #f5e8d4;
+    }
+
+    /* ===== CALENDAR ===== */
+    .calendar-legend {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--texto-suave);
+    }
+    .legend-item::before {
+      content: "";
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+    .legend-item.presencial::before { background: var(--verde-medio); }
+    .legend-item.remoto::before { background: var(--azul-medio); }
+    .legend-item.hibrido::before { background: #c89c5e; }
+
+    .calendar-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--borda-suave);
+      background: var(--borda-suave);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: 64px repeat(7, minmax(110px, 1fr));
+      grid-auto-rows: 24px;
+      gap: 1px;
+      min-width: 820px;
+      background: var(--borda-suave);
+      position: relative;
+    }
+
+    .cal-cell {
+      background: white;
+    }
+
+    .cal-header {
+      background: var(--creme-claro);
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--azul-escuro);
+      grid-row: 1 / span 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cal-header.today {
+      background: var(--azul-escuro);
+      color: var(--creme);
+    }
+    .cal-header.today small {
+      color: var(--verde-claro);
+    }
+    .cal-header small {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--texto-suave);
+      margin-top: 2px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .cal-time {
+      background: var(--creme-claro);
+      font-size: 11px;
+      color: var(--texto-suave);
+      text-align: right;
+      padding: 2px 8px 0 0;
+      font-weight: 600;
+      grid-column: 1;
+    }
+    .cal-time.half {
+      color: var(--texto-claro);
+    }
+
+    .cal-slot {
+      background: white;
+      transition: background 0.1s ease;
+    }
+    .cal-slot.half-hour {
+      background: #fefcf6;
+    }
+
+    .cal-event {
+      margin: 1px 3px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      transition: all 0.15s ease;
+      z-index: 2;
+      min-height: 0;
+    }
+    .cal-event:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(27, 58, 92, 0.15);
+      z-index: 3;
+    }
+    .cal-event .ev-name {
+      font-weight: 700;
+      color: var(--azul-escuro);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25;
+    }
+    .cal-event .ev-time {
+      font-size: 11px;
+      color: var(--texto-suave);
+      line-height: 1.2;
+    }
+    .cal-event.inactive {
+      opacity: 0.45;
+    }
+
+    .calendar-empty {
+      padding: 60px 24px;
+      text-align: center;
+      color: var(--texto-suave);
+    }
+
+    .radio-group,
+    .checkbox-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .radio-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      background: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--texto);
+      transition: all 0.15s ease;
+    }
+
+    .radio-pill:hover {
+      border-color: var(--azul-medio);
+    }
+
+    .radio-pill input {
+      accent-color: var(--azul-escuro);
+      cursor: pointer;
+    }
+
+    .radio-pill.selected {
+      background: var(--verde-suave);
+      border-color: var(--verde-medio);
+      color: var(--azul-escuro);
+    }
+
+    /* ===== BUTTONS ===== */
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--borda-suave);
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--azul-escuro);
+      color: var(--creme);
+    }
+
+    .btn-primary:hover {
+      background: var(--azul-medio);
+      transform: translateY(-1px);
+      box-shadow: var(--sombra);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border-color: var(--borda);
+      color: var(--azul-escuro);
+    }
+
+    .btn-secondary:hover {
+      background: var(--azul-suave);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border-color: var(--erro);
+      color: var(--erro);
+    }
+
+    .btn-danger:hover {
+      background: var(--erro-suave);
+    }
+
+    .btn-icon {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    /* ===== STATS ===== */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .stats { grid-template-columns: 1fr; }
+    }
+
+    .stat-card {
+      background: var(--creme-claro);
+      border: 1px solid var(--borda-suave);
+      border-radius: 14px;
+      padding: 16px 20px;
+    }
+
+    .stat-card .label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--texto-suave);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .stat-card .value {
+      font-family: "Fraunces", serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--azul-escuro);
+      margin-top: 4px;
+      line-height: 1.1;
+    }
+
+    .stat-card.green {
+      background: var(--verde-suave);
+      border-color: var(--verde-medio);
+    }
+
+    /* ===== SEARCH/FILTER BAR ===== */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+
+    .search-input {
+      flex: 1 1 260px;
+      min-width: 220px;
+    }
+
+    .search-input input {
+      width: 100%;
+    }
+
+    .toolbar select {
+      flex: 0 1 auto;
+      min-width: 170px;
+      width: auto;
+    }
+
+    /* ===== PATIENT LIST ===== */
+    .patient-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .patient-card {
+      background: white;
+      border: 1px solid var(--borda-suave);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .patient-card.is-inactive { opacity: 0.6; }
+
+    .patient-card:hover {
+      border-color: var(--azul-medio);
+      box-shadow: var(--sombra);
+      transform: translateY(-1px);
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--verde-suave);
+      color: var(--azul-escuro);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .patient-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .patient-name-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 3px;
+    }
+
+    .patient-name {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--azul-escuro);
+      letter-spacing: -0.005em;
+    }
+
+    .status-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--texto-suave);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .status-dot::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--verde-medio);
+    }
+
+    .status-dot.is-inactive { color: var(--texto-claro); }
+    .status-dot.is-inactive::before { background: var(--texto-claro); }
+
+    .patient-meta {
+      display: flex;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--texto-suave);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .patient-meta .meta-sep {
+      color: var(--texto-claro);
+      opacity: 0.6;
+    }
+
+    .patient-meta .mod-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .patient-meta .mod-tag::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--texto-claro);
+    }
+
+    .patient-meta .mod-tag.mod-presencial::before { background: var(--verde-medio); }
+    .patient-meta .mod-tag.mod-remoto::before     { background: var(--azul-medio); }
+    .patient-meta .mod-tag.mod-hibrido::before    { background: #c89c5e; }
+
+    .patient-meta .meta-value {
+      color: var(--azul-escuro);
+      font-weight: 600;
+    }
+
+    .patient-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+      opacity: 0.45;
+      transition: opacity 0.15s ease;
+    }
+
+    .patient-card:hover .patient-actions { opacity: 1; }
+
+    .icon-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--texto-suave);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+      line-height: 1;
+    }
+
+    .icon-btn:hover {
+      background: var(--azul-suave);
+      color: var(--azul-escuro);
+      border-color: var(--borda);
+    }
+
+    .icon-btn.danger:hover {
+      background: var(--erro-suave);
+      color: var(--erro);
+      border-color: var(--erro);
+    }
+
+    @media (max-width: 720px) {
+      .patient-card {
+        flex-wrap: wrap;
+      }
+      .patient-actions {
+        width: 100%;
+        justify-content: flex-end;
+        opacity: 1;
+      }
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge.ativo {
+      background: var(--verde-suave);
+      color: #2d6a4a;
+      border: 1px solid var(--verde-medio);
+    }
+
+    .badge.inativo {
+      background: var(--creme-escuro);
+      color: var(--texto-suave);
+      border: 1px solid var(--borda);
+    }
+
+    .badge.tipo {
+      background: var(--azul-suave);
+      color: var(--azul-escuro);
+      border: 1px solid var(--borda);
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--texto-suave);
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    .empty h3 {
+      font-family: "Fraunces", serif;
+      font-weight: 500;
+      font-size: 18px;
+      color: var(--azul-escuro);
+      margin-bottom: 6px;
+    }
+
+    /* ===== MODAL ===== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(27, 58, 92, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 24px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal {
+      background: var(--creme-claro);
+      border-radius: 16px;
+      padding: 28px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: var(--sombra-forte);
+      animation: slideUp 0.25s ease;
+    }
+
+    .modal h3 {
+      font-family: "Fraunces", serif;
+      font-weight: 500;
+      font-size: 20px;
+      color: var(--azul-escuro);
+      margin-bottom: 8px;
+    }
+
+    .modal p {
+      color: var(--texto-suave);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--azul-escuro);
+      color: var(--creme);
+      padding: 14px 20px;
+      border-radius: 12px;
+      box-shadow: var(--sombra-forte);
+      font-size: 14px;
+      font-weight: 600;
+      transform: translateY(120%);
+      transition: transform 0.3s ease;
+      z-index: 200;
+      max-width: 320px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+    }
+
+    .toast.success {
+      background: var(--verde-medio);
+      color: white;
+    }
+
+    .toast.error {
+      background: var(--erro);
+    }
+
+    /* ===== HIDDEN ===== */
+    .hidden {
+      display: none !important;
+    }
+
+    /* ===== HOME ===== */
+    .home-welcome {
+      background: var(--azul-escuro);
+      color: var(--creme);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      box-shadow: var(--sombra);
+    }
+
+    .home-welcome h2 {
+      font-family: "Fraunces", serif;
+      font-weight: 500;
+      font-size: 28px;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .home-date {
+      font-size: 14px;
+      color: var(--verde-claro);
+      opacity: 0.9;
+      text-transform: capitalize;
+    }
+
+    .home-summary {
+      text-align: right;
+      font-size: 14px;
+      opacity: 0.95;
+      line-height: 1.3;
+    }
+
+    .home-summary strong {
+      display: block;
+      font-family: "Fraunces", serif;
+      font-size: 38px;
+      font-weight: 600;
+      color: var(--verde-claro);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 700px) {
+      .home-summary {
+        text-align: left;
+      }
+    }
+
+    /* Stats da home: 4 colunas */
+    .home-stats {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .home-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .home-stats { grid-template-columns: 1fr; }
+    }
+
+    /* Layout principal: coluna larga + lateral */
+    .home-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .home-grid { grid-template-columns: 1fr; }
+    }
+
+    .home-side {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Atendimentos de hoje */
+    .today-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .today-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      background: white;
+      border: 1px solid var(--borda-suave);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .today-item:hover {
+      border-color: var(--azul-medio);
+      box-shadow: var(--sombra);
+      transform: translateY(-1px);
+    }
+
+    .today-item.is-past {
+      opacity: 0.5;
+    }
+
+    .today-item.is-now {
+      border-color: var(--verde-medio);
+      background: var(--verde-suave);
+    }
+
+    .today-time {
+      font-family: "Fraunces", serif;
+      font-weight: 600;
+      font-size: 18px;
+      color: var(--azul-escuro);
+      min-width: 64px;
+      text-align: center;
+    }
+
+    .today-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .today-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--azul-escuro);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .today-meta {
+      font-size: 12px;
+      color: var(--texto-suave);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .today-meta .meta-sep {
+      color: var(--texto-claro);
+      opacity: 0.7;
+    }
+
+    .today-empty {
+      padding: 32px 20px;
+      text-align: center;
+      color: var(--texto-suave);
+      background: var(--creme);
+      border-radius: 10px;
+      border: 1px dashed var(--borda);
+    }
+
+    .today-empty strong {
+      display: block;
+      font-family: "Fraunces", serif;
+      font-weight: 500;
+      font-size: 16px;
+      color: var(--azul-escuro);
+      margin-bottom: 4px;
+    }
+
+    /* Atalhos */
+    .quick-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quick-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: white;
+      border: 1px solid var(--borda-suave);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--azul-escuro);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .quick-btn:hover {
+      border-color: var(--azul-medio);
+      background: var(--azul-suave);
+      transform: translateY(-1px);
+    }
+
+    .quick-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--verde-suave);
+      color: var(--azul-escuro);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Fraunces", serif;
+      font-size: 20px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .quick-btn-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .quick-title {
+      display: block;
+      line-height: 1.2;
+    }
+
+    .quick-sub {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--texto-suave);
+      margin-top: 2px;
+    }
+
+    /* Pacientes recentes */
+    .recent-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .recent-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .recent-item:hover {
+      background: var(--creme);
+    }
+
+    .recent-item .avatar {
+      width: 34px;
+      height: 34px;
+      font-size: 12px;
+      border-radius: 9px;
+    }
+
+    .recent-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .recent-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--azul-escuro);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .recent-meta {
+      font-size: 11px;
+      color: var(--texto-suave);
+    }
+
+    .recent-empty {
+      color: var(--texto-suave);
+      font-size: 13px;
+      padding: 8px 0;
+      font-style: italic;
+    }
+
+    /* ===== Print friendly ===== */
+    @media print {
+      header, .actions, .toolbar, .patient-actions { display: none; }
+      body { background: white; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo">+</div>
+        <div>
+          <h1>Cadastro de Pacientes</h1>
+          <div class="header-sub">Gerenciamento simples e seguro</div>
+        </div>
+      </div>
+      <nav class="main-nav" id="mainNav">
+        <button class="nav-link active" data-tab="home">Início</button>
+        <button class="nav-link" data-tab="list">
+          Pacientes
+          <span id="tabCount" class="nav-count" hidden></span>
+        </button>
+        <button class="nav-link" data-tab="calendar">Agenda</button>
+      </nav>
+      <button class="nav-action" data-tab="form" title="Novo paciente" aria-label="Novo paciente">+</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ====== TAB: HOME ====== -->
+    <section id="tab-home" class="tab-content">
+      <div class="home-welcome">
+        <div>
+          <h2><span id="homeGreeting">Olá</span>!</h2>
+          <div class="home-date" id="homeDate">—</div>
+        </div>
+        <div class="home-summary" id="homeSummary">
+          <strong>0</strong>
+          <span id="homeSummaryText">sem atendimentos hoje</span>
+        </div>
+      </div>
+
+      <div class="stats home-stats">
+        <div class="stat-card">
+          <div class="label">Total de pacientes</div>
+          <div class="value" id="homeStatTotal">0</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">Pacientes ativos</div>
+          <div class="value" id="homeStatAtivos">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Atendimentos / semana</div>
+          <div class="value" id="homeStatSemana">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Receita / semana</div>
+          <div class="value" id="homeStatReceita">R$ 0,00</div>
+        </div>
+      </div>
+
+      <div class="home-grid">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-text">
+              <h2>Atendimentos de hoje</h2>
+              <p>Clique em um paciente para abrir o perfil.</p>
+            </div>
+            <div class="card-header-actions">
+              <button type="button" class="btn btn-secondary btn-icon" id="homeBtnCalendar">Ver agenda</button>
+            </div>
+          </div>
+
+          <div id="todayList" class="today-list"></div>
+
+          <div id="todayEmpty" class="today-empty hidden">
+            <strong>Nenhum atendimento agendado para hoje.</strong>
+            <span>Aproveite o tempo livre ou veja a semana completa na agenda.</span>
+          </div>
+        </div>
+
+        <aside class="home-side">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-header-text">
+                <h2>Atalhos</h2>
+              </div>
+            </div>
+            <div class="quick-actions">
+              <button type="button" class="quick-btn" id="quickNewPatient">
+                <span class="quick-icon">+</span>
+                <span class="quick-btn-text">
+                  <span class="quick-title">Novo paciente</span>
+                  <span class="quick-sub">Cadastrar um novo paciente</span>
+                </span>
+              </button>
+              <button type="button" class="quick-btn" id="quickViewList">
+                <span class="quick-icon">≡</span>
+                <span class="quick-btn-text">
+                  <span class="quick-title">Ver pacientes</span>
+                  <span class="quick-sub">Buscar e gerenciar a base</span>
+                </span>
+              </button>
+              <button type="button" class="quick-btn" id="quickViewCalendar">
+                <span class="quick-icon">▦</span>
+                <span class="quick-btn-text">
+                  <span class="quick-title">Ver agenda</span>
+                  <span class="quick-sub">Semana completa</span>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-header-text">
+                <h2>Cadastros recentes</h2>
+              </div>
+            </div>
+            <div id="recentList" class="recent-list"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ====== TAB: FORM ====== -->
+    <section id="tab-form" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2 id="formTitle">Novo Cadastro</h2>
+          <p id="formSubtitle">Preencha os dados do paciente. Campos marcados com <span style="color:var(--erro)">*</span> são obrigatórios.</p>
+        </div>
+
+        <form id="patientForm" novalidate>
+          <input type="hidden" id="patientId" />
+
+          <!-- Dados Pessoais -->
+          <div class="form-section">
+            <h3>Dados Pessoais</h3>
+            <div class="form-grid">
+              <div class="field col-8">
+                <label for="nome">Nome Completo <span class="req">*</span></label>
+                <input type="text" id="nome" name="nome" placeholder="Nome e sobrenome" required />
+                <div class="field-error" data-error-for="nome"></div>
+              </div>
+
+              <div class="field col-4">
+                <label for="dataNascimento">Data de Nascimento <span class="req">*</span></label>
+                <input type="date" id="dataNascimento" name="dataNascimento" required />
+                <div class="field-error" data-error-for="dataNascimento"></div>
+              </div>
+
+              <div class="field col-6">
+                <label for="cpf">CPF <span class="req">*</span></label>
+                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required />
+                <div class="field-error" data-error-for="cpf"></div>
+              </div>
+
+              <div class="field col-6">
+                <label for="genero">Gênero <span class="req">*</span></label>
+                <select id="genero" name="genero" required>
+                  <option value="">Selecione…</option>
+                  <option value="Feminino">Feminino</option>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Não-binário">Não-binário</option>
+                  <option value="Mulher trans">Mulher trans</option>
+                  <option value="Homem trans">Homem trans</option>
+                  <option value="Prefiro não informar">Prefiro não informar</option>
+                  <option value="__outro">Outro (especificar)</option>
+                </select>
+                <div class="field-error" data-error-for="genero"></div>
+              </div>
+
+              <div class="field col-12 hidden" id="generoOutroWrap">
+                <label for="generoOutro">Especifique o gênero</label>
+                <input type="text" id="generoOutro" name="generoOutro" placeholder="Digite o gênero" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Endereço -->
+          <div class="form-section">
+            <h3>Endereço</h3>
+            <div class="form-grid">
+              <div class="field col-3">
+                <label for="cep">
+                  CEP <span class="req">*</span>
+                  <span id="cepStatus" class="cep-status"></span>
+                </label>
+                <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9" required autocomplete="postal-code" />
+                <div class="field-error" data-error-for="cep"></div>
+              </div>
+
+              <div class="field col-9">
+                <label for="rua">Rua / Logradouro <span class="req">*</span></label>
+                <input type="text" id="rua" name="rua" placeholder="Ex: Rua das Flores" required />
+                <div class="field-error" data-error-for="rua"></div>
+              </div>
+
+              <div class="field col-2">
+                <label for="numero">Número <span class="req">*</span></label>
+                <input type="text" id="numero" name="numero" placeholder="123" required />
+                <div class="field-error" data-error-for="numero"></div>
+              </div>
+
+              <div class="field col-4">
+                <label for="complemento">Complemento</label>
+                <input type="text" id="complemento" name="complemento" placeholder="Apto, bloco…" />
+              </div>
+
+              <div class="field col-6">
+                <label for="bairro">Bairro <span class="req">*</span></label>
+                <input type="text" id="bairro" name="bairro" placeholder="Bairro" required />
+                <div class="field-error" data-error-for="bairro"></div>
+              </div>
+
+              <div class="field col-9">
+                <label for="cidade">Cidade <span class="req">*</span></label>
+                <input type="text" id="cidade" name="cidade" placeholder="Cidade" required />
+                <div class="field-error" data-error-for="cidade"></div>
+              </div>
+
+              <div class="field col-3">
+                <label for="estado">UF <span class="req">*</span></label>
+                <input type="text" id="estado" name="estado" placeholder="SP" maxlength="2" style="text-transform:uppercase" required />
+                <div class="field-error" data-error-for="estado"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contato -->
+          <div class="form-section">
+            <h3>Contato</h3>
+            <div class="form-grid">
+              <div class="field col-4">
+                <label for="celular">Celular <span class="req">*</span></label>
+                <input type="tel" id="celular" name="celular" placeholder="(00) 00000-0000" maxlength="15" required />
+                <div class="field-error" data-error-for="celular"></div>
+              </div>
+
+              <div class="field col-8">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" placeholder="email@exemplo.com" />
+                <div class="field-error" data-error-for="email"></div>
+              </div>
+
+              <div class="field col-5">
+                <label for="contatoNome">Contato próximo · Nome</label>
+                <input type="text" id="contatoNome" name="contatoNome" placeholder="Nome do contato (opcional)" />
+              </div>
+
+              <div class="field col-4">
+                <label for="contatoTelefone">Contato próximo · Telefone</label>
+                <input type="tel" id="contatoTelefone" name="contatoTelefone" placeholder="(00) 00000-0000" maxlength="15" />
+              </div>
+
+              <div class="field col-3">
+                <label for="contatoRelacao">Relação</label>
+                <input type="text" id="contatoRelacao" name="contatoRelacao" placeholder="Mãe, irmão…" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Informações da Terapia -->
+          <div class="form-section">
+            <h3>Informações da Terapia</h3>
+            <div class="form-grid">
+              <div class="field col-6">
+                <label>Tipo de paciente <span class="req">*</span></label>
+                <div class="radio-group" id="tipoPaciente">
+                  <label class="radio-pill">
+                    <input type="radio" name="tipoPaciente" value="Primeira entrevista" required />
+                    Primeira entrevista
+                  </label>
+                  <label class="radio-pill">
+                    <input type="radio" name="tipoPaciente" value="Recorrente" />
+                    Recorrente
+                  </label>
+                </div>
+                <div class="field-error" data-error-for="tipoPaciente"></div>
+              </div>
+
+              <div class="field col-6">
+                <label>Status <span class="req">*</span></label>
+                <div class="radio-group" id="statusGroup">
+                  <label class="radio-pill">
+                    <input type="radio" name="status" value="Ativo" checked />
+                    Ativo
+                  </label>
+                  <label class="radio-pill">
+                    <input type="radio" name="status" value="Inativo" />
+                    Inativo
+                  </label>
+                </div>
+              </div>
+
+              <div class="field col-4">
+                <label for="dataInicioTerapia">Data início da terapia <span class="req">*</span></label>
+                <input type="date" id="dataInicioTerapia" name="dataInicioTerapia" required />
+                <div class="field-error" data-error-for="dataInicioTerapia"></div>
+              </div>
+
+              <div class="field col-4">
+                <label for="valorSessao">Valor da sessão <span class="req">*</span></label>
+                <div class="input-prefix">
+                  <span class="prefix">R$</span>
+                  <input type="text" id="valorSessao" name="valorSessao" placeholder="0,00" inputmode="decimal" required />
+                </div>
+                <div class="field-error" data-error-for="valorSessao"></div>
+              </div>
+
+              <div class="field col-4">
+                <label for="indicacao">Indicação <span class="req">*</span></label>
+                <select id="indicacao" name="indicacao" required>
+                  <option value="">Como chegou ao tratamento?</option>
+                  <option value="Amigo">Amigo</option>
+                  <option value="Familiar">Familiar</option>
+                  <option value="Rede social">Rede social</option>
+                  <option value="Médico">Médico</option>
+                  <option value="Outro profissional de saúde">Outro profissional de saúde</option>
+                  <option value="Convênio">Convênio</option>
+                  <option value="Busca na internet">Busca na internet</option>
+                  <option value="__outro">Outro (especificar)</option>
+                </select>
+                <div class="field-error" data-error-for="indicacao"></div>
+              </div>
+
+              <div class="field col-12 hidden" id="indicacaoOutroWrap">
+                <label for="indicacaoOutro">Especifique a indicação</label>
+                <input type="text" id="indicacaoOutro" name="indicacaoOutro" placeholder="De onde veio a indicação?" />
+              </div>
+
+              <div class="field col-12">
+                <label>Modalidade de atendimento <span class="req">*</span></label>
+                <div class="radio-group" id="modalidadeGroup">
+                  <label class="radio-pill">
+                    <input type="radio" name="modalidade" value="Presencial" required />
+                    Presencial
+                  </label>
+                  <label class="radio-pill">
+                    <input type="radio" name="modalidade" value="Remoto" />
+                    Remoto
+                  </label>
+                  <label class="radio-pill">
+                    <input type="radio" name="modalidade" value="Híbrido" />
+                    Híbrido
+                  </label>
+                </div>
+                <div class="field-error" data-error-for="modalidade"></div>
+              </div>
+
+              <div class="field col-12">
+                <label>Dias e horários de atendimento</label>
+                <div id="agendamentosList" class="agendamentos-list"></div>
+                <button type="button" class="btn btn-secondary btn-icon" id="addAgendamento">+ Adicionar horário</button>
+                <div class="field-error" data-error-for="agendamentos"></div>
+              </div>
+
+              <div class="field col-12">
+                <label for="observacoes">Observações</label>
+                <textarea id="observacoes" name="observacoes" rows="3" placeholder="Anotações adicionais (opcional)"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn btn-secondary" id="btnCancelar">Limpar</button>
+            <button type="submit" class="btn btn-primary" id="btnSalvar">Salvar paciente</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ====== TAB: LIST ====== -->
+    <section id="tab-list" class="tab-content hidden">
+      <div class="stats">
+        <div class="stat-card">
+          <div class="label">Total de pacientes</div>
+          <div class="value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">Ativos</div>
+          <div class="value" id="statAtivos">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Inativos</div>
+          <div class="value" id="statInativos">0</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-text">
+            <h2>Pacientes Cadastrados</h2>
+            <p>Busque, edite ou remova pacientes da base local.</p>
+          </div>
+          <div class="card-header-actions">
+            <button type="button" class="btn btn-primary btn-icon" id="btnNovoPaciente">+ Novo paciente</button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-input">
+            <input type="text" id="searchInput" placeholder="Buscar por nome, CPF ou e-mail…" />
+          </div>
+          <select id="filterStatus">
+            <option value="">Todos os status</option>
+            <option value="Ativo">Apenas ativos</option>
+            <option value="Inativo">Apenas inativos</option>
+          </select>
+          <select id="filterTipo">
+            <option value="">Todos os tipos</option>
+            <option value="Primeira entrevista">Primeira entrevista</option>
+            <option value="Recorrente">Recorrente</option>
+          </select>
+        </div>
+
+        <div id="patientList" class="patient-list"></div>
+
+        <div id="emptyState" class="empty hidden">
+          <div class="empty-icon">📋</div>
+          <h3>Nenhum paciente encontrado</h3>
+          <p>Cadastre seu primeiro paciente na aba "Novo Paciente".</p>
+        </div>
+      </div>
+    </section>
+    <!-- ====== CALENDAR PAGE ====== -->
+    <section id="tab-calendar" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Agenda Semanal</h2>
+          <p>Visualize os atendimentos recorrentes da semana. Clique em um card para abrir o perfil do paciente.</p>
+        </div>
+
+        <div class="calendar-legend">
+          <span class="legend-item presencial">Presencial</span>
+          <span class="legend-item remoto">Remoto</span>
+          <span class="legend-item hibrido">Híbrido</span>
+          <span class="legend-item" style="margin-left:auto; opacity:0.7">— Pacientes inativos aparecem esmaecidos</span>
+        </div>
+
+        <div id="calendarEmpty" class="calendar-empty hidden">
+          <h3 style="font-family:Fraunces,serif; font-weight:500; font-size:18px; color:var(--azul-escuro); margin-bottom:8px">Nenhum atendimento agendado</h3>
+          <p>Cadastre dias e horários nos pacientes para visualizá-los aqui.</p>
+        </div>
+
+        <div class="calendar-wrapper" id="calendarWrapper">
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-profile" class="tab-content hidden">
+      <button class="back-btn" id="profileBack">Voltar para lista</button>
+
+      <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatar">--</div>
+        <div class="profile-identity">
+          <h2 id="profileName">—</h2>
+          <div class="profile-tags" id="profileTags"></div>
+        </div>
+        <div class="profile-actions" id="profileActions">
+          <button class="btn btn-icon" id="profileToggleStatus">Alternar status</button>
+          <button class="btn btn-accent btn-icon" id="profileEdit">Editar dados</button>
+          <button class="btn btn-danger-light btn-icon" id="profileDelete">Excluir</button>
+        </div>
+      </div>
+
+      <!-- ===== VIEW MODE ===== -->
+      <div id="profileViewMode" class="profile-grid">
+        <div class="profile-section">
+          <h3>Dados Pessoais</h3>
+          <div id="profilePessoais"></div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Informações da Terapia</h3>
+          <div id="profileTerapia"></div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Modalidade & Agenda</h3>
+          <div id="profileAgenda"></div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Endereço</h3>
+          <div id="profileEndereco"></div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Contato</h3>
+          <div id="profileContato"></div>
+        </div>
+
+        <div class="profile-section full" id="profileObservacoesWrap">
+          <h3>Observações</h3>
+          <div id="profileObservacoes" style="font-size:14px; color:var(--texto); line-height:1.7; white-space:pre-wrap;"></div>
+        </div>
+      </div>
+
+      <!-- ===== EDIT MODE (form é movido aqui em runtime) ===== -->
+      <div id="profileEditMode" class="hidden">
+        <div class="card">
+          <div class="card-header">
+            <h2 style="font-family:Fraunces,serif; font-weight:500; font-size:22px; color:var(--azul-escuro)">
+              Editando dados
+            </h2>
+            <p style="font-size:14px; color:var(--texto-suave); margin-top:4px">
+              Faça as alterações necessárias e clique em "Salvar alterações".
+            </p>
+          </div>
+          <div id="profileEditFormSlot"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Modal de confirmação ===== -->
+  <div class="modal-backdrop" id="confirmModal">
+    <div class="modal">
+      <h3 id="modalTitle">Confirmar exclusão</h3>
+      <p id="modalText">Tem certeza que deseja excluir este paciente? Esta ação não pode ser desfeita.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modalCancel">Cancelar</button>
+        <button class="btn btn-danger" id="modalConfirm">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toast ===== -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================
+    // STORAGE
+    // ============================================
+    const STORAGE_KEY = "pacientes_v1";
+
+    const Storage = {
+      load() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        } catch {
+          return [];
+        }
+      },
+      save(list) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      },
+    };
+
+    let patients = Storage.load();
+    let editingId = null;
+    let pendingDeleteId = null;
+
+    // ============================================
+    // CONSTANTES DE DIA/HORÁRIO
+    // ============================================
+    const DIAS_SEMANA = [
+      { val: 0, label: "Domingo", short: "Dom" },
+      { val: 1, label: "Segunda-feira", short: "Seg" },
+      { val: 2, label: "Terça-feira", short: "Ter" },
+      { val: 3, label: "Quarta-feira", short: "Qua" },
+      { val: 4, label: "Quinta-feira", short: "Qui" },
+      { val: 5, label: "Sexta-feira", short: "Sex" },
+      { val: 6, label: "Sábado", short: "Sáb" },
+    ];
+
+    const DURACOES = [30, 45, 50, 60, 75, 90, 120];
+    const SLOT_START_HOUR = 7;   // calendário começa às 07:00
+    const SLOT_END_HOUR = 22;    // termina às 22:00
+    const SLOT_MINUTES = 30;     // cada slot da grade = 30min
+    const TOTAL_SLOTS = ((SLOT_END_HOUR - SLOT_START_HOUR) * 60) / SLOT_MINUTES;
+
+    const timeToMinutes = (timeStr) => {
+      if (!timeStr) return 0;
+      const [h, m] = timeStr.split(":").map(Number);
+      return h * 60 + m;
+    };
+
+    const minutesToTime = (totalMin) => {
+      const h = Math.floor(totalMin / 60);
+      const m = totalMin % 60;
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    };
+
+    const timeToSlotIndex = (timeStr) => {
+      const min = timeToMinutes(timeStr);
+      return Math.round((min - SLOT_START_HOUR * 60) / SLOT_MINUTES);
+    };
+
+    // ============================================
+    // UTILS
+    // ============================================
+    const $ = (id) => document.getElementById(id);
+    const $$ = (sel) => document.querySelectorAll(sel);
+
+    const uid = () =>
+      Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+    const formatCPF = (v) =>
+      v
+        .replace(/\D/g, "")
+        .slice(0, 11)
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+    const formatCEP = (v) =>
+      v.replace(/\D/g, "").slice(0, 8).replace(/(\d{5})(\d)/, "$1-$2");
+
+    const formatPhone = (v) => {
+      const d = v.replace(/\D/g, "").slice(0, 11);
+      if (d.length <= 10) {
+        return d
+          .replace(/(\d{2})(\d)/, "($1) $2")
+          .replace(/(\d{4})(\d)/, "$1-$2");
+      }
+      return d
+        .replace(/(\d{2})(\d)/, "($1) $2")
+        .replace(/(\d{5})(\d)/, "$1-$2");
+    };
+
+    const validateCPF = (cpf) => {
+      const c = cpf.replace(/\D/g, "");
+      if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
+      let sum = 0;
+      for (let i = 0; i < 9; i++) sum += parseInt(c[i]) * (10 - i);
+      let r = 11 - (sum % 11);
+      if (r >= 10) r = 0;
+      if (r !== parseInt(c[9])) return false;
+      sum = 0;
+      for (let i = 0; i < 10; i++) sum += parseInt(c[i]) * (11 - i);
+      r = 11 - (sum % 11);
+      if (r >= 10) r = 0;
+      return r === parseInt(c[10]);
+    };
+
+    const formatDateBR = (iso) => {
+      if (!iso) return "—";
+      const [y, m, d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    };
+
+    const initials = (name) =>
+      name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase();
+
+    const calcAge = (iso) => {
+      if (!iso) return null;
+      const today = new Date();
+      const birth = new Date(iso);
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+      return age;
+    };
+
+    // Máscara de moeda BR enquanto o usuário digita: "15000" -> "150,00"
+    const formatCurrencyInput = (v) => {
+      const digits = String(v).replace(/\D/g, "");
+      if (!digits) return "";
+      const n = parseInt(digits, 10) / 100;
+      return n.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    };
+
+    // Converte string "1.250,00" -> 1250.00 (Number)
+    const parseCurrency = (v) => {
+      if (v == null || v === "") return 0;
+      const s = String(v).replace(/\./g, "").replace(",", ".");
+      const n = parseFloat(s);
+      return isNaN(n) ? 0 : n;
+    };
+
+    // Formata número para exibição: 150 -> "R$ 150,00"
+    const formatCurrency = (v) => {
+      const n = typeof v === "number" ? v : parseCurrency(v);
+      return n.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      });
+    };
+
+    // ============================================
+    // TOAST
+    // ============================================
+    const showToast = (msg, type = "success") => {
+      const t = $("toast");
+      t.textContent = msg;
+      t.className = `toast show ${type}`;
+      setTimeout(() => t.classList.remove("show"), 2800);
+    };
+
+    // ============================================
+    // TABS / NAVIGATION
+    // ============================================
+    let currentProfileId = null;
+    let returnTo = null; // 'profile' | null - para voltar ao perfil após editar
+
+    $$("[data-tab]").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        switchToTab(tab.dataset.tab);
+      });
+    });
+
+    const switchToTab = (name) => {
+      // No perfil, nenhum item da nav fica destacado
+      $$("[data-tab]").forEach((t) => {
+        t.classList.toggle("active", name !== "profile" && t.dataset.tab === name);
+      });
+      $("tab-home").classList.toggle("hidden", name !== "home");
+      $("tab-form").classList.toggle("hidden", name !== "form");
+      $("tab-list").classList.toggle("hidden", name !== "list");
+      $("tab-calendar").classList.toggle("hidden", name !== "calendar");
+      $("tab-profile").classList.toggle("hidden", name !== "profile");
+      if (name === "home") renderHome();
+      if (name === "list") renderList();
+      if (name === "calendar") renderCalendar();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // ============================================
+    // INPUT MASKS
+    // ============================================
+    $("cpf").addEventListener("input", (e) => (e.target.value = formatCPF(e.target.value)));
+    $("cep").addEventListener("input", (e) => (e.target.value = formatCEP(e.target.value)));
+    ["celular", "contatoTelefone"].forEach((id) => {
+      $(id).addEventListener("input", (e) => (e.target.value = formatPhone(e.target.value)));
+    });
+    $("estado").addEventListener("input", (e) => {
+      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+    });
+    $("valorSessao").addEventListener("input", (e) => {
+      e.target.value = formatCurrencyInput(e.target.value);
+    });
+
+    // ============================================
+    // CEP AUTOFILL (ViaCEP) - dispara automaticamente ao digitar 8 dígitos
+    // ============================================
+    let cepTimer = null;
+    let lastCepSearched = "";
+
+    const setCepStatus = (state, text) => {
+      const el = $("cepStatus");
+      el.className = "cep-status";
+      if (!state) return;
+      el.classList.add("show", state);
+      el.textContent = text || "";
+    };
+
+    const fetchCep = async (cepDigits) => {
+      if (cepDigits === lastCepSearched) return;
+      lastCepSearched = cepDigits;
+      setCepStatus("loading", "buscando…");
+      $("cep").classList.remove("cep-found", "invalid");
+
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`);
+        if (!res.ok) throw new Error("rede");
+        const d = await res.json();
+
+        if (d.erro) {
+          setCepStatus("error", "CEP não encontrado");
+          showFieldError("cep", "CEP não encontrado nos Correios.");
+          return;
+        }
+
+        // Sobrescreve os campos com os dados oficiais
+        if (d.logradouro) $("rua").value = d.logradouro;
+        if (d.bairro) $("bairro").value = d.bairro;
+        if (d.localidade) $("cidade").value = d.localidade;
+        if (d.uf) $("estado").value = d.uf;
+
+        setCepStatus("success", "endereço encontrado");
+        $("cep").classList.add("cep-found");
+        showFieldError("cep", "");
+
+        // Foca no número, que é o que ainda falta preencher
+        setTimeout(() => $("numero").focus(), 80);
+      } catch {
+        setCepStatus("error", "sem conexão");
+        // Não bloqueia - usuário pode preencher manualmente
+      }
+    };
+
+    $("cep").addEventListener("input", (e) => {
+      const digits = e.target.value.replace(/\D/g, "");
+      // Limpa status quando o usuário começa a digitar de novo
+      if (digits.length < 8) {
+        setCepStatus(null);
+        $("cep").classList.remove("cep-found");
+        lastCepSearched = "";
+        return;
+      }
+      // Debounce de 250ms quando atinge 8 dígitos
+      clearTimeout(cepTimer);
+      cepTimer = setTimeout(() => fetchCep(digits), 250);
+    });
+
+    // Também busca ao colar/sair do campo (caso o usuário cole um CEP completo)
+    $("cep").addEventListener("blur", (e) => {
+      const digits = e.target.value.replace(/\D/g, "");
+      if (digits.length === 8 && digits !== lastCepSearched) fetchCep(digits);
+    });
+
+    // ============================================
+    // CONDITIONAL FIELDS (Outro)
+    // ============================================
+    $("genero").addEventListener("change", (e) => {
+      $("generoOutroWrap").classList.toggle("hidden", e.target.value !== "__outro");
+    });
+
+    $("indicacao").addEventListener("change", (e) => {
+      $("indicacaoOutroWrap").classList.toggle("hidden", e.target.value !== "__outro");
+    });
+
+    // ============================================
+    // AGENDAMENTOS REPEATER
+    // ============================================
+    let agendamentosState = []; // [{ diaSemana, horario, duracao }]
+
+    const renderAgendamentosList = () => {
+      const list = $("agendamentosList");
+      if (agendamentosState.length === 0) {
+        list.innerHTML = `
+          <div class="agendamento-empty">
+            Nenhum horário cadastrado. Clique em "+ Adicionar horário" para incluir um atendimento recorrente.
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = agendamentosState
+        .map((a, idx) => {
+          const diaOpts = DIAS_SEMANA.map(
+            (d) =>
+              `<option value="${d.val}" ${Number(a.diaSemana) === d.val ? "selected" : ""}>${d.label}</option>`
+          ).join("");
+          const durOpts = DURACOES.map(
+            (d) =>
+              `<option value="${d}" ${Number(a.duracao) === d ? "selected" : ""}>${d} min</option>`
+          ).join("");
+          return `
+            <div class="agendamento-row" data-idx="${idx}">
+              <div>
+                <label>Dia da semana</label>
+                <select data-field="diaSemana">${diaOpts}</select>
+              </div>
+              <div>
+                <label>Horário</label>
+                <input type="time" data-field="horario" value="${a.horario || ""}" />
+              </div>
+              <div>
+                <label>Duração</label>
+                <select data-field="duracao">${durOpts}</select>
+              </div>
+              <button type="button" class="remove-row" data-remove="${idx}">Remover</button>
+            </div>
+          `;
+        })
+        .join("");
+    };
+
+    $("addAgendamento").addEventListener("click", () => {
+      agendamentosState.push({ diaSemana: 1, horario: "14:00", duracao: 50 });
+      renderAgendamentosList();
+      // Limpa erro caso tenha
+      showFieldError("agendamentos", "");
+    });
+
+    $("agendamentosList").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-remove]");
+      if (!btn) return;
+      const idx = Number(btn.dataset.remove);
+      agendamentosState.splice(idx, 1);
+      renderAgendamentosList();
+    });
+
+    $("agendamentosList").addEventListener("change", (e) => {
+      const row = e.target.closest("[data-idx]");
+      if (!row) return;
+      const idx = Number(row.dataset.idx);
+      const field = e.target.dataset.field;
+      if (!field) return;
+      let val = e.target.value;
+      if (field === "diaSemana" || field === "duracao") val = Number(val);
+      agendamentosState[idx][field] = val;
+    });
+
+    // Inicializa vazio
+    renderAgendamentosList();
+
+    // ============================================
+    // RADIO PILL HIGHLIGHT
+    // ============================================
+    $$('.radio-group').forEach((group) => {
+      const update = () => {
+        group.querySelectorAll(".radio-pill").forEach((pill) => {
+          const input = pill.querySelector("input");
+          pill.classList.toggle("selected", input.checked);
+        });
+      };
+      group.addEventListener("change", update);
+      update();
+    });
+
+    // ============================================
+    // FORM VALIDATION & SUBMIT
+    // ============================================
+    const showFieldError = (name, msg) => {
+      const el = document.querySelector(`[data-error-for="${name}"]`);
+      if (el) el.textContent = msg || "";
+      const input = $(name);
+      if (input) input.classList.toggle("invalid", !!msg);
+    };
+
+    const clearErrors = () => {
+      $$("[data-error-for]").forEach((el) => (el.textContent = ""));
+      $$(".invalid").forEach((el) => el.classList.remove("invalid"));
+    };
+
+    const validateForm = (data) => {
+      clearErrors();
+      const errors = {};
+      if (!data.nome || data.nome.length < 3) errors.nome = "Informe o nome completo.";
+      if (!data.dataNascimento) errors.dataNascimento = "Informe a data de nascimento.";
+      else if (new Date(data.dataNascimento) > new Date()) errors.dataNascimento = "Data inválida.";
+      if (!data.genero) errors.genero = "Selecione o gênero.";
+      if (!data.cpf) errors.cpf = "Informe o CPF.";
+      else if (!validateCPF(data.cpf)) errors.cpf = "CPF inválido.";
+      if (!data.cep || data.cep.replace(/\D/g, "").length !== 8) errors.cep = "CEP inválido.";
+      if (!data.rua) errors.rua = "Informe a rua.";
+      if (!data.numero) errors.numero = "Informe o número.";
+      if (!data.bairro) errors.bairro = "Informe o bairro.";
+      if (!data.cidade) errors.cidade = "Informe a cidade.";
+      if (!data.estado || data.estado.length !== 2) errors.estado = "UF (2 letras).";
+      if (!data.celular || data.celular.replace(/\D/g, "").length < 10)
+        errors.celular = "Celular inválido.";
+      if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))
+        errors.email = "E-mail inválido.";
+      if (!data.tipoPaciente) errors.tipoPaciente = "Selecione o tipo.";
+      if (!data.dataInicioTerapia) errors.dataInicioTerapia = "Informe a data.";
+      if (!data.indicacao) errors.indicacao = "Selecione a indicação.";
+      if (!data.valorSessao || parseCurrency(data.valorSessao) <= 0)
+        errors.valorSessao = "Informe um valor válido.";
+      if (!data.modalidade) errors.modalidade = "Selecione a modalidade.";
+
+      // Validação de agendamentos: cada linha deve ter horário válido
+      const invalidAgenda = agendamentosState.find(
+        (a) => !a.horario || a.duracao <= 0 || a.diaSemana == null
+      );
+      if (invalidAgenda)
+        errors.agendamentos = "Preencha dia, horário e duração de todos os agendamentos.";
+
+      // CPF duplicado (exceto se editando o mesmo)
+      const cpfNum = data.cpf.replace(/\D/g, "");
+      const dup = patients.find(
+        (p) => p.cpf.replace(/\D/g, "") === cpfNum && p.id !== editingId
+      );
+      if (dup && !errors.cpf) errors.cpf = "Já existe um paciente com este CPF.";
+
+      Object.entries(errors).forEach(([k, v]) => showFieldError(k, v));
+      return Object.keys(errors).length === 0;
+    };
+
+    const collectFormData = () => {
+      const f = $("patientForm");
+      const fd = new FormData(f);
+      const data = Object.fromEntries(fd.entries());
+
+      if (data.genero === "__outro") data.genero = data.generoOutro?.trim() || "Outro";
+      delete data.generoOutro;
+
+      if (data.indicacao === "__outro")
+        data.indicacao = data.indicacaoOutro?.trim() || "Outro";
+      delete data.indicacaoOutro;
+
+      // Valor da sessão: armazenar como número
+      data.valorSessao = parseCurrency(data.valorSessao);
+
+      // Agendamentos: armazenar copia do estado atual
+      data.agendamentos = agendamentosState.map((a) => ({
+        diaSemana: Number(a.diaSemana),
+        horario: a.horario,
+        duracao: Number(a.duracao),
+      }));
+
+      return data;
+    };
+
+    $("patientForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = collectFormData();
+      if (!validateForm(data)) {
+        showToast("Verifique os campos destacados.", "error");
+        const firstErr = document.querySelector(".invalid");
+        if (firstErr) firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      if (editingId) {
+        const idx = patients.findIndex((p) => p.id === editingId);
+        if (idx !== -1) {
+          patients[idx] = { ...patients[idx], ...data, atualizadoEm: new Date().toISOString() };
+        }
+        showToast("Paciente atualizado com sucesso.");
+      } else {
+        patients.push({
+          id: uid(),
+          ...data,
+          criadoEm: new Date().toISOString(),
+        });
+        showToast("Paciente cadastrado com sucesso.");
+      }
+
+      Storage.save(patients);
+      const savedId = editingId || patients[patients.length - 1].id;
+      const cameFromProfile = returnTo === "profile";
+      if (cameFromProfile) {
+        // Edição inline no perfil: devolve form, sai do edit mode, recarrega view
+        exitProfileEditMode(savedId);
+      } else {
+        resetForm();
+        switchToTab("list");
+      }
+    });
+
+    $("btnCancelar").addEventListener("click", () => {
+      // Se estamos no modo edição do perfil, "Cancelar edição" só sai do modo
+      if (returnTo === "profile") {
+        exitProfileEditMode(currentProfileId);
+        return;
+      }
+      // Comportamento original: limpar form
+      if (
+        editingId ||
+        confirm("Deseja limpar todos os campos do formulário?")
+      ) {
+        resetForm();
+      }
+    });
+
+    const resetForm = () => {
+      $("patientForm").reset();
+      $("patientId").value = "";
+      editingId = null;
+      returnTo = null;
+      $("formTitle").textContent = "Novo Cadastro";
+      $("formSubtitle").innerHTML =
+        'Preencha os dados do paciente. Campos marcados com <span style="color:var(--erro)">*</span> são obrigatórios.';
+      $("btnSalvar").textContent = "Salvar paciente";
+      $("btnCancelar").textContent = "Limpar";
+      $("generoOutroWrap").classList.add("hidden");
+      $("indicacaoOutroWrap").classList.add("hidden");
+      setCepStatus(null);
+      $("cep").classList.remove("cep-found");
+      lastCepSearched = "";
+      agendamentosState = [];
+      renderAgendamentosList();
+      clearErrors();
+      $$(".radio-group").forEach((g) => {
+        g.querySelectorAll(".radio-pill").forEach((p) => {
+          const i = p.querySelector("input");
+          p.classList.toggle("selected", i.checked);
+        });
+      });
+    };
+
+    // ============================================
+    // LIST RENDERING
+    // ============================================
+    const renderStats = () => {
+      $("statTotal").textContent = patients.length;
+      $("statAtivos").textContent = patients.filter((p) => p.status === "Ativo").length;
+      $("statInativos").textContent = patients.filter((p) => p.status === "Inativo").length;
+      const count = $("tabCount");
+      if (patients.length > 0) {
+        count.textContent = patients.length;
+        count.hidden = false;
+      } else {
+        count.textContent = "";
+        count.hidden = true;
+      }
+    };
+
+    const renderList = () => {
+      renderStats();
+      const search = $("searchInput").value.toLowerCase().trim();
+      const fStatus = $("filterStatus").value;
+      const fTipo = $("filterTipo").value;
+
+      let filtered = patients.slice().sort((a, b) =>
+        a.nome.localeCompare(b.nome, "pt-BR")
+      );
+
+      if (search) {
+        filtered = filtered.filter(
+          (p) =>
+            p.nome.toLowerCase().includes(search) ||
+            p.cpf.includes(search) ||
+            (p.email || "").toLowerCase().includes(search)
+        );
+      }
+      if (fStatus) filtered = filtered.filter((p) => p.status === fStatus);
+      if (fTipo) filtered = filtered.filter((p) => p.tipoPaciente === fTipo);
+
+      const list = $("patientList");
+      const empty = $("emptyState");
+
+      if (filtered.length === 0) {
+        list.innerHTML = "";
+        empty.classList.remove("hidden");
+        if (patients.length === 0) {
+          empty.querySelector("h3").textContent = "Nenhum paciente cadastrado";
+          empty.querySelector("p").textContent =
+            'Cadastre seu primeiro paciente na aba "Novo Paciente".';
+        } else {
+          empty.querySelector("h3").textContent = "Nenhum resultado";
+          empty.querySelector("p").textContent =
+            "Ajuste a busca ou os filtros para encontrar pacientes.";
+        }
+        return;
+      }
+
+      empty.classList.add("hidden");
+      list.innerHTML = filtered
+        .map((p) => {
+          const age = calcAge(p.dataNascimento);
+          const valorTxt = p.valorSessao != null && p.valorSessao !== ""
+            ? formatCurrency(p.valorSessao)
+            : null;
+          const modCls = p.modalidade
+            ? "mod-" + p.modalidade.toLowerCase().replace("í", "i")
+            : "";
+          const isInactive = p.status === "Inativo";
+          const cardCls = ["patient-card"];
+          if (isInactive) cardCls.push("is-inactive");
+
+          const metaParts = [];
+          if (p.modalidade) {
+            metaParts.push(`<span class="mod-tag ${modCls}">${escapeHtml(p.modalidade)}</span>`);
+          }
+          metaParts.push(`<span>${escapeHtml(p.tipoPaciente)}</span>`);
+          if (age !== null) metaParts.push(`<span>${age} anos</span>`);
+          if (valorTxt) metaParts.push(`<span class="meta-value">${valorTxt}</span>`);
+          const meta = metaParts.join(`<span class="meta-sep">·</span>`);
+
+          return `
+            <div class="${cardCls.join(" ")}" data-action="view" data-id="${p.id}">
+              <div class="avatar">${initials(p.nome)}</div>
+              <div class="patient-info">
+                <div class="patient-name-row">
+                  <span class="patient-name">${escapeHtml(p.nome)}</span>
+                  <span class="status-dot ${isInactive ? 'is-inactive' : ''}">${p.status}</span>
+                </div>
+                <div class="patient-meta">${meta}</div>
+              </div>
+              <div class="patient-actions">
+                <button class="icon-btn" data-action="edit" data-id="${p.id}" title="Editar" aria-label="Editar">✎</button>
+                <button class="icon-btn danger" data-action="delete" data-id="${p.id}" title="Excluir" aria-label="Excluir">×</button>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    };
+
+    const escapeHtml = (str) =>
+      String(str || "").replace(/[&<>"']/g, (m) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])
+      );
+
+    // List actions delegation
+    $("patientList").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      if (action === "edit") {
+        // Abre o perfil já em modo edição
+        showProfile(id);
+        enterProfileEditMode(id);
+      }
+      else if (action === "delete") confirmDelete(id);
+      else if (action === "view") showProfile(id);
+    });
+
+    $("searchInput").addEventListener("input", renderList);
+    $("filterStatus").addEventListener("change", renderList);
+    $("filterTipo").addEventListener("change", renderList);
+
+    $("btnNovoPaciente").addEventListener("click", () => {
+      resetForm();
+      switchToTab("form");
+    });
+
+    // ============================================
+    // EDIT
+    // ============================================
+    // ============================================
+    // FILL FORM WITH PATIENT DATA (sem trocar de aba)
+    // ============================================
+    const fillFormWithPatient = (id) => {
+      const p = patients.find((x) => x.id === id);
+      if (!p) return null;
+      editingId = id;
+
+      // preencher form
+      const fields = [
+        "nome", "dataNascimento", "cpf", "cep", "rua", "numero",
+        "complemento", "bairro", "cidade", "estado", "celular",
+        "email", "contatoNome", "contatoTelefone", "contatoRelacao",
+        "dataInicioTerapia", "observacoes",
+      ];
+      fields.forEach((f) => {
+        if ($(f)) $(f).value = p[f] || "";
+      });
+
+      // Valor da sessão (número -> string formatada)
+      if (p.valorSessao != null && p.valorSessao !== "") {
+        $("valorSessao").value = Number(p.valorSessao).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      } else {
+        $("valorSessao").value = "";
+      }
+
+      // gênero
+      const generoSelect = $("genero");
+      const generoOpts = Array.from(generoSelect.options).map((o) => o.value);
+      if (generoOpts.includes(p.genero)) {
+        generoSelect.value = p.genero;
+        $("generoOutroWrap").classList.add("hidden");
+      } else {
+        generoSelect.value = "__outro";
+        $("generoOutro").value = p.genero;
+        $("generoOutroWrap").classList.remove("hidden");
+      }
+
+      // indicação
+      const indSelect = $("indicacao");
+      const indOpts = Array.from(indSelect.options).map((o) => o.value);
+      if (indOpts.includes(p.indicacao)) {
+        indSelect.value = p.indicacao;
+        $("indicacaoOutroWrap").classList.add("hidden");
+      } else {
+        indSelect.value = "__outro";
+        $("indicacaoOutro").value = p.indicacao;
+        $("indicacaoOutroWrap").classList.remove("hidden");
+      }
+
+      // radios
+      document.querySelector(`input[name="tipoPaciente"][value="${p.tipoPaciente}"]`)
+        ?.click();
+      document.querySelector(`input[name="status"][value="${p.status}"]`)
+        ?.click();
+      if (p.modalidade) {
+        document.querySelector(`input[name="modalidade"][value="${p.modalidade}"]`)
+          ?.click();
+      }
+
+      // Agendamentos
+      agendamentosState = Array.isArray(p.agendamentos)
+        ? p.agendamentos.map((a) => ({
+            diaSemana: Number(a.diaSemana),
+            horario: a.horario,
+            duracao: Number(a.duracao),
+          }))
+        : [];
+      renderAgendamentosList();
+
+      // CEP visual: marca como já encontrado
+      if (p.cep && p.cep.replace(/\D/g, "").length === 8) {
+        lastCepSearched = p.cep.replace(/\D/g, "");
+      }
+
+      return p;
+    };
+
+    // ============================================
+    // EDIT VIA TAB-FORM (novo paciente / acesso direto via tab)
+    // ============================================
+    const loadForEdit = (id) => {
+      const p = fillFormWithPatient(id);
+      if (!p) return;
+
+      $("formTitle").textContent = "Editar Paciente";
+      $("formSubtitle").textContent = `Atualizando: ${p.nome}`;
+      $("btnSalvar").textContent = "Atualizar paciente";
+      $("btnCancelar").textContent = "Limpar";
+
+      switchToTab("form");
+    };
+
+    // ============================================
+    // PROFILE EDIT MODE (edição inline no perfil)
+    // ============================================
+    const enterProfileEditMode = (id) => {
+      const p = fillFormWithPatient(id);
+      if (!p) return;
+
+      returnTo = "profile";
+
+      // Move o <form> de tab-form para dentro do slot de edição do perfil
+      const form = $("patientForm");
+      $("profileEditFormSlot").appendChild(form);
+
+      // UI: esconde view, mostra edit, esconde ações do perfil e botão voltar
+      $("profileViewMode").classList.add("hidden");
+      $("profileEditMode").classList.remove("hidden");
+      $("profileActions").classList.add("hidden");
+      $("profileBack").classList.add("hidden");
+
+      // Ajusta textos dos botões
+      $("btnSalvar").textContent = "Salvar alterações";
+      $("btnCancelar").textContent = "Cancelar edição";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const exitProfileEditMode = (savedId) => {
+      // Devolve o form para tab-form (entre o card-header e o local original)
+      const form = $("patientForm");
+      const tabFormCard = $("tab-form").querySelector(".card");
+      tabFormCard.appendChild(form);
+
+      // Restaura visual
+      $("profileViewMode").classList.remove("hidden");
+      $("profileEditMode").classList.add("hidden");
+      $("profileActions").classList.remove("hidden");
+      $("profileBack").classList.remove("hidden");
+
+      // Reset estado
+      resetForm();
+
+      // Re-renderiza o perfil (com dados atualizados se foi salvo)
+      const targetId = savedId || currentProfileId;
+      if (targetId) {
+        showProfile(targetId);
+      } else {
+        switchToTab("list");
+      }
+    };
+
+    // ============================================
+    // DELETE
+    // ============================================
+    const confirmDelete = (id) => {
+      pendingDeleteId = id;
+      const p = patients.find((x) => x.id === id);
+      if (!p) return;
+      $("modalText").textContent =
+        `Tem certeza que deseja excluir ${p.nome}? Esta ação não pode ser desfeita.`;
+      $("confirmModal").classList.add("show");
+    };
+
+    $("modalCancel").addEventListener("click", () => {
+      $("confirmModal").classList.remove("show");
+      pendingDeleteId = null;
+    });
+
+    $("modalConfirm").addEventListener("click", () => {
+      if (!pendingDeleteId) return;
+      const wasOnProfile = currentProfileId === pendingDeleteId;
+      patients = patients.filter((p) => p.id !== pendingDeleteId);
+      Storage.save(patients);
+      pendingDeleteId = null;
+      $("confirmModal").classList.remove("show");
+      if (wasOnProfile) {
+        currentProfileId = null;
+        switchToTab("list");
+      } else {
+        renderList();
+      }
+      showToast("Paciente excluído.");
+    });
+
+    $("confirmModal").addEventListener("click", (e) => {
+      if (e.target.id === "confirmModal") {
+        $("confirmModal").classList.remove("show");
+        pendingDeleteId = null;
+      }
+    });
+
+    // ============================================
+    // PROFILE PAGE
+    // ============================================
+    const showProfile = (id) => {
+      const p = patients.find((x) => x.id === id);
+      if (!p) {
+        showToast("Paciente não encontrado.", "error");
+        return;
+      }
+      currentProfileId = id;
+
+      // Header
+      $("profileAvatar").textContent = initials(p.nome);
+      $("profileName").textContent = p.nome;
+
+      const age = calcAge(p.dataNascimento);
+      const tags = [];
+      tags.push(`<span class="badge ${p.status === "Ativo" ? "ativo" : "inativo"}">${p.status}</span>`);
+      tags.push(`<span class="badge tipo">${escapeHtml(p.tipoPaciente)}</span>`);
+      if (age !== null) tags.push(`<span>${age} anos</span>`);
+      tags.push(`<span>· ${escapeHtml(p.cpf)}</span>`);
+      $("profileTags").innerHTML = tags.join(" ");
+
+      // Botão de toggle status
+      $("profileToggleStatus").textContent =
+        p.status === "Ativo" ? "Desativar paciente" : "Reativar paciente";
+
+      // Helper para gerar info-rows
+      const row = (label, value, opts = {}) => {
+        const isEmpty = value == null || value === "" || value === "—";
+        const cls = ["info-value"];
+        if (isEmpty) cls.push("empty");
+        if (opts.highlight) cls.push("highlight");
+        if (opts.currency) cls.push("currency");
+        const display = isEmpty ? "Não informado" : value;
+        return `
+          <div class="info-row">
+            <span class="info-label">${label}</span>
+            <span class="${cls.join(" ")}">${display}</span>
+          </div>
+        `;
+      };
+
+      // Dados Pessoais
+      $("profilePessoais").innerHTML =
+        row("Nome", escapeHtml(p.nome)) +
+        row("CPF", escapeHtml(p.cpf)) +
+        row("Nascimento",
+          formatDateBR(p.dataNascimento) +
+          (age !== null ? ` <span style="color:var(--texto-suave)">· ${age} anos</span>` : "")
+        ) +
+        row("Gênero", escapeHtml(p.genero));
+
+      // Informações da Terapia
+      $("profileTerapia").innerHTML =
+        row("Tipo", escapeHtml(p.tipoPaciente)) +
+        row("Início", formatDateBR(p.dataInicioTerapia)) +
+        row("Status", `<span class="badge ${p.status === "Ativo" ? "ativo" : "inativo"}">${p.status}</span>`) +
+        row("Indicação", escapeHtml(p.indicacao)) +
+        row("Valor da sessão",
+          p.valorSessao != null && p.valorSessao !== "" ? formatCurrency(p.valorSessao) : "",
+          { currency: true }
+        );
+
+      // Modalidade & Agenda
+      const modCls = p.modalidade
+        ? "mod-" + p.modalidade.toLowerCase().replace("í", "i")
+        : "";
+      const modBadge = p.modalidade
+        ? `<span class="badge ${modCls}">${escapeHtml(p.modalidade)}</span>`
+        : "";
+
+      let agendaHtml;
+      if (Array.isArray(p.agendamentos) && p.agendamentos.length > 0) {
+        const sorted = p.agendamentos.slice().sort(
+          (a, b) =>
+            (Number(a.diaSemana) - Number(b.diaSemana)) ||
+            timeToMinutes(a.horario) - timeToMinutes(b.horario)
+        );
+        agendaHtml = sorted
+          .map((a) => {
+            const dia = DIAS_SEMANA.find((d) => d.val === Number(a.diaSemana));
+            const fim = minutesToTime(timeToMinutes(a.horario) + Number(a.duracao));
+            return `
+              <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; margin-top:6px; background:white; border-radius:8px; border:1px solid var(--borda-suave); font-size:13px">
+                <strong style="color:var(--azul-escuro); min-width:72px">${dia ? dia.short : "?"}</strong>
+                <span>${escapeHtml(a.horario)} – ${fim}</span>
+                <span style="color:var(--texto-suave); margin-left:auto">${a.duracao} min</span>
+              </div>
+            `;
+          })
+          .join("");
+      } else {
+        agendaHtml = `<div style="color:var(--texto-claro); font-style:italic; font-size:13px; padding:8px 0">Nenhum horário cadastrado.</div>`;
+      }
+
+      $("profileAgenda").innerHTML =
+        row("Modalidade", modBadge) +
+        `<div class="info-row" style="grid-template-columns: 130px 1fr;">
+           <span class="info-label">Horários</span>
+           <div>${agendaHtml}</div>
+         </div>`;
+
+      // Endereço
+      const enderecoLinha1 = `${escapeHtml(p.rua)}, ${escapeHtml(p.numero)}` +
+        (p.complemento ? ` <span style="color:var(--texto-suave)">— ${escapeHtml(p.complemento)}</span>` : "");
+      $("profileEndereco").innerHTML =
+        row("CEP", escapeHtml(p.cep)) +
+        row("Logradouro", enderecoLinha1) +
+        row("Bairro", escapeHtml(p.bairro)) +
+        row("Cidade", `${escapeHtml(p.cidade)}/${escapeHtml(p.estado)}`);
+
+      // Contato
+      const contatoProximo = p.contatoNome
+        ? `${escapeHtml(p.contatoNome)}` +
+          (p.contatoRelacao ? ` <span style="color:var(--texto-suave)">(${escapeHtml(p.contatoRelacao)})</span>` : "") +
+          (p.contatoTelefone ? `<br><span style="color:var(--texto-suave); font-size:13px">${escapeHtml(p.contatoTelefone)}</span>` : "")
+        : "";
+      $("profileContato").innerHTML =
+        row("Celular", escapeHtml(p.celular), { highlight: true }) +
+        row("E-mail", escapeHtml(p.email)) +
+        row("Contato próximo", contatoProximo);
+
+      // Observações (esconde a seção se vazio)
+      if (p.observacoes && p.observacoes.trim()) {
+        $("profileObservacoesWrap").classList.remove("hidden");
+        $("profileObservacoes").textContent = p.observacoes;
+      } else {
+        $("profileObservacoesWrap").classList.add("hidden");
+      }
+
+      switchToTab("profile");
+    };
+
+    // Ações do perfil
+    $("profileBack").addEventListener("click", () => {
+      currentProfileId = null;
+      switchToTab("list");
+    });
+
+    $("profileEdit").addEventListener("click", () => {
+      if (!currentProfileId) return;
+      enterProfileEditMode(currentProfileId);
+    });
+
+    $("profileDelete").addEventListener("click", () => {
+      if (!currentProfileId) return;
+      confirmDelete(currentProfileId);
+    });
+
+    $("profileToggleStatus").addEventListener("click", () => {
+      if (!currentProfileId) return;
+      const idx = patients.findIndex((p) => p.id === currentProfileId);
+      if (idx === -1) return;
+      const novoStatus = patients[idx].status === "Ativo" ? "Inativo" : "Ativo";
+      patients[idx].status = novoStatus;
+      patients[idx].atualizadoEm = new Date().toISOString();
+      Storage.save(patients);
+      showToast(`Paciente marcado como ${novoStatus}.`);
+      showProfile(currentProfileId);
+    });
+
+    // ============================================
+    // CALENDAR (Agenda Semanal)
+    // ============================================
+    const renderCalendar = () => {
+      const grid = $("calendarGrid");
+      const empty = $("calendarEmpty");
+      const wrapper = $("calendarWrapper");
+
+      // Coleta todos os agendamentos com referência ao paciente
+      const events = [];
+      patients.forEach((p) => {
+        if (Array.isArray(p.agendamentos)) {
+          p.agendamentos.forEach((a) => {
+            if (a.horario && a.diaSemana != null && a.duracao) {
+              events.push({ ...a, patient: p });
+            }
+          });
+        }
+      });
+
+      if (events.length === 0) {
+        wrapper.classList.add("hidden");
+        empty.classList.remove("hidden");
+        return;
+      }
+      wrapper.classList.remove("hidden");
+      empty.classList.add("hidden");
+
+      // Header (linha 1) + linhas de tempo
+      const today = new Date().getDay(); // 0=Dom..6=Sáb
+      const headerCells = DIAS_SEMANA.map(
+        (d) => `
+          <div class="cal-cell cal-header${d.val === today ? " today" : ""}" style="grid-column:${d.val + 2}">
+            ${d.short}
+            <small>${d.label.replace("-feira", "")}</small>
+          </div>`
+      ).join("");
+
+      // Coluna de tempo + slots vazios
+      let timeCol = "";
+      let slotCells = "";
+      for (let i = 0; i < TOTAL_SLOTS; i++) {
+        const totalMin = SLOT_START_HOUR * 60 + i * SLOT_MINUTES;
+        const isFullHour = totalMin % 60 === 0;
+        const timeLabel = isFullHour ? minutesToTime(totalMin) : "";
+        timeCol += `<div class="cal-cell cal-time${isFullHour ? "" : " half"}" style="grid-row:${i + 3}; grid-column:1">${timeLabel}</div>`;
+        for (let d = 0; d < 7; d++) {
+          slotCells += `<div class="cal-cell cal-slot${isFullHour ? "" : " half-hour"}" style="grid-row:${i + 3}; grid-column:${d + 2}"></div>`;
+        }
+      }
+
+      // Eventos
+      const eventCells = events
+        .map((ev) => {
+          const startSlot = timeToSlotIndex(ev.horario);
+          const slotsCount = Math.max(1, Math.ceil(ev.duracao / SLOT_MINUTES));
+          if (startSlot < 0 || startSlot + slotsCount > TOTAL_SLOTS) return "";
+          const modCls = ev.patient.modalidade
+            ? "mod-" + ev.patient.modalidade.toLowerCase().replace("í", "i")
+            : "";
+          const inactiveCls = ev.patient.status === "Inativo" ? " inactive" : "";
+          const fim = minutesToTime(timeToMinutes(ev.horario) + Number(ev.duracao));
+          return `
+            <div class="cal-event ${modCls}${inactiveCls}"
+                 style="grid-column:${Number(ev.diaSemana) + 2}; grid-row:${startSlot + 3} / span ${slotsCount}"
+                 data-patient-id="${ev.patient.id}"
+                 title="${escapeHtml(ev.patient.nome)} · ${ev.horario}–${fim} · ${escapeHtml(ev.patient.modalidade || "")}">
+              <div class="ev-name">${escapeHtml(ev.patient.nome)}</div>
+              <div class="ev-time">${ev.horario} – ${fim}</div>
+            </div>
+          `;
+        })
+        .join("");
+
+      // Define a quantidade de linhas total: 1 linha de header (occupa 2 grid rows na config CSS) + slots
+      grid.style.gridTemplateRows = `36px 8px repeat(${TOTAL_SLOTS}, 24px)`;
+      grid.innerHTML = `
+        <div class="cal-cell cal-header" style="grid-column:1; background:var(--creme-claro)"></div>
+        ${headerCells}
+        ${timeCol}
+        ${slotCells}
+        ${eventCells}
+      `;
+    };
+
+    // Click em evento -> abrir perfil
+    $("calendarGrid").addEventListener("click", (e) => {
+      const ev = e.target.closest(".cal-event");
+      if (!ev) return;
+      showProfile(ev.dataset.patientId);
+    });
+
+    // ============================================
+    // HOME (Dashboard)
+    // ============================================
+    const renderHome = () => {
+      const now = new Date();
+      const hour = now.getHours();
+      let greeting = "Boa noite";
+      if (hour < 12) greeting = "Bom dia";
+      else if (hour < 18) greeting = "Boa tarde";
+      $("homeGreeting").textContent = greeting;
+
+      // Data por extenso (ex: "domingo, 10 de maio")
+      $("homeDate").textContent = now.toLocaleDateString("pt-BR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      });
+
+      // Coleta agendamentos de hoje (somente pacientes ativos)
+      const todayDay = now.getDay();
+      const todayEvents = [];
+      patients.forEach((p) => {
+        if (p.status !== "Ativo") return;
+        if (!Array.isArray(p.agendamentos)) return;
+        p.agendamentos.forEach((a) => {
+          if (Number(a.diaSemana) === todayDay && a.horario && a.duracao) {
+            todayEvents.push({ ...a, patient: p });
+          }
+        });
+      });
+      todayEvents.sort(
+        (a, b) => timeToMinutes(a.horario) - timeToMinutes(b.horario)
+      );
+
+      // Resumo do banner
+      const summaryNum = $("homeSummary").querySelector("strong");
+      const summaryText = $("homeSummaryText");
+      summaryNum.textContent = todayEvents.length;
+      summaryText.textContent =
+        todayEvents.length === 0
+          ? "sem atendimentos hoje"
+          : todayEvents.length === 1
+          ? "atendimento hoje"
+          : "atendimentos hoje";
+
+      // Stats
+      const ativos = patients.filter((p) => p.status === "Ativo");
+      $("homeStatTotal").textContent = patients.length;
+      $("homeStatAtivos").textContent = ativos.length;
+
+      const atendSemana = ativos.reduce(
+        (sum, p) => sum + (Array.isArray(p.agendamentos) ? p.agendamentos.length : 0),
+        0
+      );
+      $("homeStatSemana").textContent = atendSemana;
+
+      const receitaSemana = ativos.reduce((sum, p) => {
+        const valor = Number(p.valorSessao) || 0;
+        const sessoes = Array.isArray(p.agendamentos) ? p.agendamentos.length : 0;
+        return sum + valor * sessoes;
+      }, 0);
+      $("homeStatReceita").textContent = formatCurrency(receitaSemana);
+
+      // Lista de hoje
+      const todayList = $("todayList");
+      const todayEmpty = $("todayEmpty");
+
+      if (todayEvents.length === 0) {
+        todayList.innerHTML = "";
+        todayEmpty.classList.remove("hidden");
+      } else {
+        todayEmpty.classList.add("hidden");
+        const nowMinutes = now.getHours() * 60 + now.getMinutes();
+        todayList.innerHTML = todayEvents
+          .map((ev) => {
+            const ini = timeToMinutes(ev.horario);
+            const fimMin = ini + Number(ev.duracao);
+            const fim = minutesToTime(fimMin);
+            const cls = ["today-item"];
+            if (fimMin < nowMinutes) cls.push("is-past");
+            else if (ini <= nowMinutes && nowMinutes < fimMin) cls.push("is-now");
+
+            const metaParts = [
+              `<span>${ev.horario} – ${fim}</span>`,
+              `<span class="meta-sep">·</span>`,
+              `<span>${ev.duracao} min</span>`,
+            ];
+            if (ev.patient.modalidade) {
+              metaParts.push(`<span class="meta-sep">·</span>`);
+              metaParts.push(`<span>${escapeHtml(ev.patient.modalidade)}</span>`);
+            }
+
+            return `
+              <div class="${cls.join(" ")}" data-patient-id="${ev.patient.id}">
+                <div class="today-time">${ev.horario}</div>
+                <div class="avatar">${initials(ev.patient.nome)}</div>
+                <div class="today-info">
+                  <div class="today-name">${escapeHtml(ev.patient.nome)}</div>
+                  <div class="today-meta">${metaParts.join("")}</div>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      // Cadastros recentes (últimos 5 por criadoEm)
+      const recent = patients
+        .slice()
+        .sort((a, b) => (b.criadoEm || "").localeCompare(a.criadoEm || ""))
+        .slice(0, 5);
+
+      const recentList = $("recentList");
+      if (recent.length === 0) {
+        recentList.innerHTML =
+          '<div class="recent-empty">Nenhum paciente cadastrado ainda.</div>';
+      } else {
+        recentList.innerHTML = recent
+          .map(
+            (p) => `
+              <div class="recent-item" data-patient-id="${p.id}">
+                <div class="avatar">${initials(p.nome)}</div>
+                <div class="recent-text">
+                  <div class="recent-name">${escapeHtml(p.nome)}</div>
+                  <div class="recent-meta">${escapeHtml(p.tipoPaciente)}${
+                    p.modalidade ? " · " + escapeHtml(p.modalidade) : ""
+                  }</div>
+                </div>
+              </div>
+            `
+          )
+          .join("");
+      }
+
+      // Atualiza também o badge de contagem do header
+      renderStats();
+    };
+
+    // Click delegations da home
+    $("todayList").addEventListener("click", (e) => {
+      const item = e.target.closest("[data-patient-id]");
+      if (item) showProfile(item.dataset.patientId);
+    });
+
+    $("recentList").addEventListener("click", (e) => {
+      const item = e.target.closest("[data-patient-id]");
+      if (item) showProfile(item.dataset.patientId);
+    });
+
+    $("quickNewPatient").addEventListener("click", () => {
+      resetForm();
+      switchToTab("form");
+    });
+    $("quickViewList").addEventListener("click", () => switchToTab("list"));
+    $("quickViewCalendar").addEventListener("click", () => switchToTab("calendar"));
+    $("homeBtnCalendar").addEventListener("click", () => switchToTab("calendar"));
+
+    // ============================================
+    // MOCK DATA SEED (executa apenas uma vez)
+    // ============================================
+    const SEED_FLAG = "mock_seeded_v1";
+
+    const seedMockData = () => {
+      const NOMES = [
+        ["Isadora Rossi", "Feminino"],
+        ["Lucas Almeida Santos", "Masculino"],
+        ["Mariana Silva Costa", "Feminino"],
+        ["Pedro Henrique Souza", "Masculino"],
+        ["Camila Ferreira Lima", "Feminino"],
+        ["Rafael Souza Pereira", "Masculino"],
+        ["Beatriz Lima Oliveira", "Feminino"],
+        ["Gabriel Carvalho Mendes", "Masculino"],
+        ["Larissa Oliveira Santos", "Feminino"],
+        ["André Costa Martins", "Masculino"],
+        ["Julia Pereira Rocha", "Feminino"],
+        ["Felipe Martins Dias", "Masculino"],
+        ["Ana Santos Cardoso", "Feminino"],
+        ["Bruno Ribeiro Alves", "Masculino"],
+        ["Carolina Gomes Ferreira", "Feminino"],
+        ["Diego Rodrigues Lopes", "Masculino"],
+        ["Eduarda Cardoso Pinto", "Feminino"],
+        ["Fernando Barbosa Castro", "Masculino"],
+        ["Helena Mendes Araújo", "Feminino"],
+        ["Igor Araújo Costa", "Masculino"],
+        ["Juliana Castro Sousa", "Não-binário"],
+        ["Leonardo Rocha Vieira", "Masculino"],
+        ["Marina Dias Borges", "Feminino"],
+        ["Nicolas Cunha Faria", "Masculino"],
+        ["Patricia Moreira Lima", "Feminino"],
+      ];
+
+      const ENDERECOS = [
+        { bairro: "Pinheiros",       cidade: "São Paulo",      uf: "SP", cep: "05422-001", rua: "Rua dos Pinheiros" },
+        { bairro: "Vila Madalena",   cidade: "São Paulo",      uf: "SP", cep: "05435-000", rua: "Rua Aspicuelta" },
+        { bairro: "Moema",           cidade: "São Paulo",      uf: "SP", cep: "04546-000", rua: "Avenida Ibirapuera" },
+        { bairro: "Brooklin",        cidade: "São Paulo",      uf: "SP", cep: "04564-001", rua: "Rua Bandeirantes" },
+        { bairro: "Itaim Bibi",      cidade: "São Paulo",      uf: "SP", cep: "04532-001", rua: "Rua Pequetita" },
+        { bairro: "Jardim Paulista", cidade: "São Paulo",      uf: "SP", cep: "01404-001", rua: "Alameda Santos" },
+        { bairro: "Perdizes",        cidade: "São Paulo",      uf: "SP", cep: "05015-002", rua: "Rua Cardoso de Almeida" },
+        { bairro: "Vila Mariana",    cidade: "São Paulo",      uf: "SP", cep: "04101-001", rua: "Rua Domingos de Morais" },
+        { bairro: "Ipanema",         cidade: "Rio de Janeiro", uf: "RJ", cep: "22420-040", rua: "Rua Visconde de Pirajá" },
+        { bairro: "Botafogo",        cidade: "Rio de Janeiro", uf: "RJ", cep: "22250-040", rua: "Rua São Clemente" },
+        { bairro: "Savassi",         cidade: "Belo Horizonte", uf: "MG", cep: "30130-000", rua: "Rua da Bahia" },
+        { bairro: "Centro",          cidade: "Curitiba",       uf: "PR", cep: "80020-300", rua: "Rua XV de Novembro" },
+      ];
+
+      const INDICACOES   = ["Amigo", "Familiar", "Médico", "Convênio", "Rede social", "Busca na internet", "Outro profissional de saúde"];
+      const RELACOES     = ["Mãe", "Pai", "Irmã", "Irmão", "Esposa", "Marido", "Amigo", "Filha"];
+      const CONT_NOMES   = ["Maria Silva", "João Santos", "Ana Costa", "Pedro Lima", "Júlia Souza", "Carlos Mendes"];
+      const MODALIDADES  = ["Presencial", "Remoto", "Híbrido"];
+      const TIPOS        = ["Recorrente", "Recorrente", "Recorrente", "Recorrente", "Primeira entrevista"];
+      const HORARIOS     = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"];
+      const DURACOES_M   = [50, 50, 50, 50, 60, 45];
+      const VALORES      = [200, 250, 300, 350, 400, 250, 300];
+      const OBS          = [
+        "Apresenta quadro de ansiedade leve. Foco no manejo de pensamentos automáticos.",
+        "Boa adesão ao tratamento. Avançando bem nas sessões.",
+        "Em processo de luto. Acompanhar sintomas depressivos.",
+        "Conflitos familiares relacionados ao trabalho. Trabalhar comunicação.",
+        "Sessões focadas em autoestima e autocuidado.",
+        "Uso de medicação supervisionada por psiquiatra parceiro.",
+      ];
+      const INATIVOS = [8, 17, 22];
+
+      const pad2 = (n) => String(n).padStart(2, "0");
+
+      const genCpf = () => {
+        const d = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10));
+        let s = 0;
+        for (let i = 0; i < 9; i++) s += d[i] * (10 - i);
+        let v = 11 - (s % 11); if (v >= 10) v = 0;
+        d.push(v);
+        s = 0;
+        for (let i = 0; i < 10; i++) s += d[i] * (11 - i);
+        v = 11 - (s % 11); if (v >= 10) v = 0;
+        d.push(v);
+        return d.join("").replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+      };
+
+      const genPhone = () => {
+        const ddds = [11, 11, 11, 11, 21, 31, 41];
+        const ddd = ddds[Math.floor(Math.random() * ddds.length)];
+        const a = String(90000 + Math.floor(Math.random() * 9999)).slice(0, 5);
+        const b = String(1000 + Math.floor(Math.random() * 9000)).slice(0, 4);
+        return `(${ddd}) ${a}-${b}`;
+      };
+
+      const emailFromName = (nome) => {
+        const parts = nome.toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .split(/\s+/);
+        return `${parts[0]}.${parts[parts.length - 1]}@email.com`;
+      };
+
+      const today = new Date();
+      const yearNow = today.getFullYear();
+
+      return NOMES.map(([nome, genero], i) => {
+        const idade = 22 + ((i * 7) % 38); // 22 a 60
+        const dataNascimento = `${yearNow - idade}-${pad2(((i * 5) % 12) + 1)}-${pad2(((i * 11) % 27) + 1)}`;
+
+        const e = ENDERECOS[i % ENDERECOS.length];
+        const tipoPaciente = TIPOS[i % TIPOS.length];
+        const status = INATIVOS.includes(i) ? "Inativo" : "Ativo";
+        const modalidade = MODALIDADES[i % 3];
+        const valorSessao = VALORES[i % VALORES.length];
+        const indicacao = INDICACOES[i % INDICACOES.length];
+
+        const monthsAgo = (i % 12) + 1;
+        const dInicio = new Date(today.getFullYear(), today.getMonth() - monthsAgo, today.getDate());
+        const dataInicioTerapia = dInicio.toISOString().slice(0, 10);
+
+        // Agendamentos: distribui pelos 7 dias da semana (0=Dom..6=Sáb)
+        const agendamentos = [];
+        const incluir = status === "Ativo" && (tipoPaciente === "Recorrente" || i % 2 === 0);
+        if (incluir) {
+          agendamentos.push({
+            diaSemana: i % 7,
+            horario: HORARIOS[i % HORARIOS.length],
+            duracao: DURACOES_M[i % DURACOES_M.length],
+          });
+          if (i % 5 === 0) {
+            agendamentos.push({
+              diaSemana: (i + 3) % 7,
+              horario: HORARIOS[(i + 4) % HORARIOS.length],
+              duracao: 50,
+            });
+          }
+        }
+
+        const hasContato = i % 3 === 0;
+        const criadoEm = new Date(
+          today.getTime() - (NOMES.length - i) * 5 * 86400000
+        ).toISOString();
+
+        return {
+          id: uid(),
+          nome,
+          dataNascimento,
+          cpf: genCpf(),
+          genero,
+          cep: e.cep,
+          rua: e.rua,
+          numero: String(50 + ((i * 17) % 800)),
+          complemento: i % 4 === 0 ? `Apto ${100 + i * 3}` : "",
+          bairro: e.bairro,
+          cidade: e.cidade,
+          estado: e.uf,
+          celular: genPhone(),
+          email: emailFromName(nome),
+          contatoNome:     hasContato ? CONT_NOMES[i % CONT_NOMES.length] : "",
+          contatoTelefone: hasContato ? genPhone() : "",
+          contatoRelacao:  hasContato ? RELACOES[i % RELACOES.length] : "",
+          tipoPaciente,
+          status,
+          dataInicioTerapia,
+          valorSessao,
+          indicacao,
+          modalidade,
+          agendamentos,
+          observacoes: i % 4 === 0 ? OBS[i % OBS.length] : "",
+          criadoEm,
+        };
+      });
+    };
+
+    // ============================================
+    // INIT
+    // ============================================
+    if (!localStorage.getItem(SEED_FLAG)) {
+      patients = seedMockData();
+      Storage.save(patients);
+      localStorage.setItem(SEED_FLAG, "1");
+    }
+    switchToTab("home");
+  </script>
+</body>
+</html>
