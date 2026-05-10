@@ -1,21 +1,29 @@
 # app-psico
 
-Aplicativo simples (single-file HTML) para gerenciamento de pacientes, voltado a psicólogos. Cadastro, busca, agenda semanal recorrente e visão geral em um único arquivo `cadastro-pacientes.html`. Os dados são persistidos no `localStorage` do navegador.
+Aplicativo simples (single-file HTML) para gerenciamento de pacientes, voltado a psicólogos. Cadastro, busca, agenda semanal recorrente e visão geral em um único arquivo `index.html`. Os dados são persistidos no `localStorage` do navegador.
 
-## Como rodar
+## Como rodar localmente
 
 Não precisa de servidor nem build. Basta abrir o arquivo no navegador:
 
 ```bash
-open cadastro-pacientes.html
+open index.html
 ```
 
 Ou rodar um servidor estático (opcional, se quiser usar a URL):
 
 ```bash
 python3 -m http.server 8080
-# depois acesse http://localhost:8080/cadastro-pacientes.html
+# depois acesse http://localhost:8080
 ```
+
+## Deploy
+
+Site estático puro, deployable em qualquer host:
+
+- **Vercel**: importar este repo, deixar o framework como _Other_, sem build command. A raiz já serve `index.html`.
+- **GitHub Pages**: ativar Pages na branch `main` (root). A raiz já serve `index.html`.
+- **Netlify / Cloudflare Pages**: idem, sem build necessário.
 
 ## Funcionalidades
 
