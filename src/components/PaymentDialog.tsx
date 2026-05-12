@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import type {
   MetodoPagamento,
   Pagamento,
@@ -99,7 +100,7 @@ export function PaymentDialog({
     onSave(pagamento);
   };
 
-  return (
+  return createPortal(
     <div
       className="modal-backdrop"
       onClick={(e) => {
@@ -200,6 +201,7 @@ export function PaymentDialog({
           </button>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body
   );
 }
