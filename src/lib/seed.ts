@@ -238,9 +238,16 @@ const dateKey = (d: Date): string => {
 };
 
 /**
- * Gera pagamentos para um paciente cobrindo os últimos ~60 dias até hoje.
- * Sessões do mês anterior: ~75% pagas. Mês corrente até hoje: ~55% pagas.
- * Sessões futuras: sem registro (continuam "pendentes" pela ausência).
+ * Gera pagamentos para um paciente cobrindo os últimos 12 meses até hoje.
+ *
+ * Taxa de pagamento escalonada por idade da sessão:
+ *  - 4+ meses atrás: 100% pago (clínica em dia há tempos)
+ *  - 2-3 meses atrás: 99% pago (raros atrasos antigos)
+ *  - 1 mês atrás: 92% pago (~8% das sessões viram atrasadas)
+ *  - mês atual: 60% pago (~40% pendentes do mês corrente)
+ *
+ * Sessões futuras: sem registro (aparecem como "Agendada" via lógica
+ * de `generatePaymentRows`, derivada por data).
  */
 const generateMockPagamentos = (
   patient: Pick<Paciente, "agendamentos" | "valorSessao" | "dataInicioTerapia">,
@@ -253,8 +260,7 @@ const generateMockPagamentos = (
     ? new Date(patient.dataInicioTerapia + "T00:00:00")
     : null;
 
-  const start = new Date(today);
-  start.setDate(start.getDate() - 60);
+  const start = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
   start.setHours(0, 0, 0, 0);
 
   const result: Pagamento[] = [];
@@ -268,17 +274,22 @@ const generateMockPagamentos = (
         if (Number(a.diaSemana) !== weekday) continue;
         if (!a.horario || !a.duracao) continue;
 
-        const isCurrentMonth =
-          cursor.getFullYear() === today.getFullYear() &&
-          cursor.getMonth() === today.getMonth();
-        const paidRatio = isCurrentMonth ? 0.55 : 0.75;
+        const monthsAgo =
+          (today.getFullYear() - cursor.getFullYear()) * 12 +
+          (today.getMonth() - cursor.getMonth());
+
+        let paidRatio: number;
+        if (monthsAgo >= 4) paidRatio = 1.0;
+        else if (monthsAgo >= 2) paidRatio = 0.99;
+        else if (monthsAgo === 1) paidRatio = 0.92;
+        else paidRatio = 0.6;
+
         const pseudoRand = ((seedI * 17 + step * 31) % 100) / 100;
         const isPaid = pseudoRand < paidRatio;
         step += 1;
 
-        if (!isPaid) continue; // sem registro = pendente
+        if (!isPaid) continue; // sem registro = pendente/atrasado pela lógica de payments.ts
 
-        // Data de pagamento: hoje, ou no mesmo dia ± 1
         const pagoEm = new Date(cursor);
         pagoEm.setHours(12 + (step % 6), 0, 0, 0);
 

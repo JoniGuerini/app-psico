@@ -369,6 +369,16 @@ button {
   color: #8a4715;
 }
 
+.sidebar-nav-badge-danger {
+  background: rgba(194, 92, 92, 0.24);
+  color: #f0a8a8;
+}
+
+.sidebar-nav-link.active .sidebar-nav-badge-danger {
+  background: rgba(139, 31, 31, 0.16);
+  color: #8b1f1f;
+}
+
 .sidebar-footer {
   margin-top: auto;
   padding-top: 12px;
@@ -1204,6 +1214,19 @@ select.invalid {
 
 .stat-card.clickable.warn:hover {
   border-color: #c89c5e;
+}
+
+.stat-card.clickable.danger {
+  background: #f6dede;
+  border-color: #d9a0a0;
+}
+
+.stat-card.clickable.danger:hover {
+  border-color: #b94a4a;
+}
+
+.stat-card.clickable.danger .stat-sub strong {
+  color: #8b1f1f;
 }
 
 .stat-card .stat-sub {
@@ -3052,6 +3075,34 @@ select.invalid {
   color: var(--texto-suave);
 }
 
+.kpi-card.kpi-pendente {
+  background: #fdf6ea;
+  border-color: #e8d6b0;
+}
+
+.kpi-card.kpi-atrasado {
+  background: #fcecec;
+  border-color: #e7bdbd;
+}
+
+.kpi-card.kpi-atrasado .kpi-value {
+  color: #8b1f1f;
+}
+
+.kpi-card.kpi-pago {
+  background: var(--verde-suave);
+  border-color: #c4dec9;
+}
+
+.kpi-card.kpi-pago .kpi-value {
+  color: #2f6f49;
+}
+
+.payment-subtitle-badge {
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
 .payments-toolbar {
   display: flex;
   align-items: center;
@@ -3156,6 +3207,24 @@ select.invalid {
   border-color: var(--borda);
 }
 
+.payment-row.is-overdue {
+  background: #fdf6f6;
+  border-color: #e7bdbd;
+}
+
+.payment-row.is-overdue:hover {
+  border-color: #c25c5c;
+}
+
+.payment-row.is-scheduled {
+  background: #fbfcfe;
+  border-color: #d8e1ec;
+}
+
+.payment-row.is-scheduled:hover {
+  border-color: var(--azul-medio);
+}
+
 .payment-date {
   display: flex;
   flex-direction: column;
@@ -3231,6 +3300,22 @@ select.invalid {
 }
 .payment-badge.pending::before {
   background: #c89c5e;
+}
+
+.payment-badge.late {
+  background: #f6dede;
+  color: #8b1f1f;
+}
+.payment-badge.late::before {
+  background: #c25c5c;
+}
+
+.payment-badge.scheduled {
+  background: var(--azul-suave);
+  color: var(--azul-medio);
+}
+.payment-badge.scheduled::before {
+  background: var(--azul-medio);
 }
 
 .payment-method {
@@ -3419,6 +3504,30 @@ select.invalid {
   max-width: 220px;
 }
 
+.pending-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.pending-status {
+  max-width: 200px;
+}
+
+.pending-overdue-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f6dede;
+  color: #8b1f1f;
+  padding: 2px 10px;
+  border-radius: 999px;
+  margin-left: 4px;
+}
+
 .pending-empty {
   display: flex;
   flex-direction: column;
@@ -3450,7 +3559,7 @@ select.invalid {
 
 .pending-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) 140px 110px auto;
+  grid-template-columns: minmax(0, 1.5fr) 130px 110px 110px auto;
   align-items: center;
   gap: 16px;
   padding: 14px 18px;
@@ -3462,6 +3571,19 @@ select.invalid {
 
 .pending-row:hover {
   border-color: var(--borda);
+}
+
+.pending-row.is-overdue {
+  background: #fdf6f6;
+  border-color: #e7bdbd;
+}
+
+.pending-row.is-overdue:hover {
+  border-color: #c25c5c;
+}
+
+.pending-status-cell {
+  display: inline-flex;
 }
 
 .pending-patient {
@@ -3553,7 +3675,8 @@ select.invalid {
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
       "patient patient"
-      "when value"
+      "when status"
+      "value value"
       "actions actions";
   }
   .pending-patient {
@@ -3562,8 +3685,13 @@ select.invalid {
   .pending-when {
     grid-area: when;
   }
+  .pending-status-cell {
+    grid-area: status;
+    justify-content: flex-end;
+  }
   .pending-value {
     grid-area: value;
+    text-align: left;
   }
   .pending-actions {
     grid-area: actions;

@@ -47,12 +47,14 @@ export function PaymentDialog({
   const [pagoEm, setPagoEm] = useState("");
   const [observacao, setObservacao] = useState("");
 
-  // Carrega o form a partir da row sempre que abre
+  // Carrega o form a partir da row sempre que abre.
+  // "Atrasado" e "Agendada" são estados derivados — internamente
+  // persistimos como "Pendente" (o select só aceita Pago/Pendente).
   useEffect(() => {
     if (!open || !row) return;
     const p = row.pagamento;
     setValor(numberToCurrencyInput(p?.valor ?? row.valor));
-    setStatus(p?.status ?? "Pago");
+    setStatus(p?.status ?? (row.status === "Pago" ? "Pago" : "Pendente"));
     setMetodo((p?.metodo as MetodoPagamento) ?? "PIX");
     setPagoEm(
       p?.pagoEm
@@ -114,6 +116,16 @@ export function PaymentDialog({
         <h3 id="payment-dialog-title">Registrar pagamento</h3>
         <p className="payment-subtitle">
           <strong>{patientName}</strong>
+          {row.status === "Atrasado" && (
+            <span className="payment-badge late payment-subtitle-badge">
+              Atrasada
+            </span>
+          )}
+          {row.status === "Agendada" && (
+            <span className="payment-badge scheduled payment-subtitle-badge">
+              Agendada
+            </span>
+          )}
           <br />
           {dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)} ·{" "}
           {row.horario}

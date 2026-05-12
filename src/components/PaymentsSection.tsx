@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { Paciente, Pagamento, StatusPagamento } from "../types/patient";
+import type { Paciente, Pagamento } from "../types/patient";
 import { usePatients } from "../store/usePatients";
 import { useToast } from "./useToast";
 import {
@@ -18,7 +18,12 @@ interface PaymentsSectionProps {
   patient: Paciente;
 }
 
-type FilterStatus = "todas" | "pendentes" | "pagas";
+type FilterStatus =
+  | "todas"
+  | "pendentes"
+  | "atrasadas"
+  | "agendadas"
+  | "pagas";
 
 export function PaymentsSection({ patient }: PaymentsSectionProps) {
   const { upsertPagamento, removePagamento } = usePatients();
@@ -31,27 +36,22 @@ export function PaymentsSection({ patient }: PaymentsSectionProps) {
   const { from, to } = useMemo(() => monthRange(cursor), [cursor]);
   const today = useMemo(() => startOfDay(new Date()), []);
 
-  // Não mostramos sessões "futuras além do mês corrente" como pendentes
-  // pra não inflar o KPI; quando o mês exibido é o atual, corta no hoje.
-  const effectiveTo = useMemo(() => {
-    if (
-      cursor.getFullYear() === today.getFullYear() &&
-      cursor.getMonth() === today.getMonth()
-    ) {
-      return today;
-    }
-    if (to.getTime() > today.getTime()) return today;
-    return to;
-  }, [cursor, today, to]);
-
+  // Mostramos o mês inteiro — sessões futuras aparecem como "Agendada"
+  // e não inflam o KPI de pendentes.
   const allRows = useMemo(
-    () => generatePaymentRows(patient, from, effectiveTo),
-    [patient, from, effectiveTo]
+    () => generatePaymentRows(patient, from, to),
+    [patient, from, to]
   );
 
   const filteredRows = useMemo(() => {
     if (filter === "todas") return allRows;
-    const target: StatusPagamento = filter === "pagas" ? "Pago" : "Pendente";
+    const targetMap = {
+      pagas: "Pago",
+      pendentes: "Pendente",
+      atrasadas: "Atrasado",
+      agendadas: "Agendada",
+    } as const;
+    const target = targetMap[filter];
     return allRows.filter((r) => r.status === target);
   }, [allRows, filter]);
 
@@ -139,6 +139,18 @@ export function PaymentsSection({ patient }: PaymentsSectionProps) {
             {totals.pendenteCount === 1 ? "sessão" : "sessões"}
           </span>
         </div>
+        {totals.atrasadoCount > 0 && (
+          <div className="kpi-card kpi-atrasado">
+            <span className="kpi-label">Atrasado em {monthTitle}</span>
+            <span className="kpi-value">
+              {formatCurrency(totals.atrasado)}
+            </span>
+            <span className="kpi-meta">
+              {totals.atrasadoCount}{" "}
+              {totals.atrasadoCount === 1 ? "sessão" : "sessões"}
+            </span>
+          </div>
+        )}
         <div className="kpi-card kpi-pago">
           <span className="kpi-label">Pago em {monthTitle}</span>
           <span className="kpi-value">{formatCurrency(totals.pagoMes)}</span>
@@ -190,6 +202,8 @@ export function PaymentsSection({ patient }: PaymentsSectionProps) {
           options={[
             { value: "todas", label: "Todas as sessões" },
             { value: "pendentes", label: "Somente pendentes" },
+            { value: "atrasadas", label: "Somente atrasadas" },
+            { value: "agendadas", label: "Somente agendadas" },
             { value: "pagas", label: "Somente pagas" },
           ]}
           ariaLabel="Filtrar pagamentos"
@@ -211,11 +225,24 @@ export function PaymentsSection({ patient }: PaymentsSectionProps) {
               row.date.getMonth() + 1
             ).padStart(2, "0")}`;
             const paid = row.status === "Pago";
+            const late = row.status === "Atrasado";
+            const scheduled = row.status === "Agendada";
+            const badgeClass = paid
+              ? "paid"
+              : late
+                ? "late"
+                : scheduled
+                  ? "scheduled"
+                  : "pending";
+            const rowClass = paid
+              ? "payment-row is-paid"
+              : late
+                ? "payment-row is-overdue"
+                : scheduled
+                  ? "payment-row is-scheduled"
+                  : "payment-row is-pending";
             return (
-              <li
-                key={row.key}
-                className={"payment-row" + (paid ? " is-paid" : " is-pending")}
-              >
+              <li key={row.key} className={rowClass}>
                 <div className="payment-date">
                   <span className="payment-date-dm">{dataLabel}</span>
                   <span className="payment-date-dw">{dia?.short}</span>
@@ -225,7 +252,7 @@ export function PaymentsSection({ patient }: PaymentsSectionProps) {
                   {formatCurrency(row.valor)}
                 </div>
                 <div className="payment-status">
-                  <span className={"payment-badge " + (paid ? "paid" : "pending")}>
+                  <span className={"payment-badge " + badgeClass}>
                     {row.status}
                   </span>
                   {paid && row.pagamento?.metodo && (

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { usePatients } from "../store/usePatients";
 import { formatCurrency, initials } from "../lib/format";
 import { minutesToTime, timeToMinutes } from "../lib/time";
-import { collectPendingPayments, monthRange } from "../lib/payments";
+import { collectPendingPayments } from "../lib/payments";
 import { startOfDay } from "../lib/calendar";
 import type { Modalidade, Paciente } from "../types/patient";
 
@@ -72,13 +72,19 @@ export function HomePage() {
     return sum + valor * sessoes;
   }, 0);
 
-  const pendingThisMonth = useMemo(() => {
+  // KPI mostra APENAS sessões atrasadas (mês já virou sem pagamento).
+  // Pra capturá-las, olhamos os últimos 12 meses.
+  const overdue = useMemo(() => {
     const today = startOfDay(new Date());
-    const { from } = monthRange(today);
-    return collectPendingPayments(patients, from, today);
+    const from = startOfDay(
+      new Date(today.getFullYear() - 1, today.getMonth(), 1)
+    );
+    return collectPendingPayments(patients, from, today).filter(
+      (p) => p.row.status === "Atrasado"
+    );
   }, [patients]);
-  const pendingCount = pendingThisMonth.length;
-  const pendingTotal = pendingThisMonth.reduce((sum, p) => sum + p.row.valor, 0);
+  const overdueCount = overdue.length;
+  const overdueTotal = overdue.reduce((sum, p) => sum + p.row.valor, 0);
 
   return (
     <>
@@ -114,13 +120,17 @@ export function HomePage() {
         </div>
         <button
           type="button"
-          className={"stat-card clickable" + (pendingCount > 0 ? " warn" : "")}
-          onClick={() => navigate("/pagamentos/pendentes")}
-          aria-label="Ver pagamentos pendentes"
+          className={
+            "stat-card clickable" + (overdueCount > 0 ? " danger" : "")
+          }
+          onClick={() =>
+            navigate("/pagamentos/pendentes?status=atrasado")
+          }
+          aria-label="Ver pagamentos atrasados"
         >
-          <div className="label">Pagamentos pendentes</div>
-          <div className="value">{pendingCount}</div>
-          <div className="stat-sub">{formatCurrency(pendingTotal)}</div>
+          <div className="label">Pagamentos atrasados</div>
+          <div className="value">{overdueCount}</div>
+          <div className="stat-sub">{formatCurrency(overdueTotal)}</div>
         </button>
       </div>
 

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { usePatients } from "../store/usePatients";
 import { useToast } from "../components/useToast";
 import {
@@ -15,13 +15,21 @@ import { PaymentDialog } from "../components/PaymentDialog";
 import type { Pagamento } from "../types/patient";
 
 type Periodo = "mes" | "3meses" | "tudo";
+type StatusFilter = "todas" | "pendente" | "atrasado";
 
 export function PendingPaymentsPage() {
   const navigate = useNavigate();
   const { patients, upsertPagamento, removePagamento } = usePatients();
   const { showToast } = useToast();
 
-  const [periodo, setPeriodo] = useState<Periodo>("mes");
+  // Default agora é "Últimos 3 meses" pra também capturar atrasados.
+  const [periodo, setPeriodo] = useState<Periodo>("3meses");
+  const [searchParams] = useSearchParams();
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(() => {
+    const initial = searchParams.get("status");
+    if (initial === "atrasado" || initial === "pendente") return initial;
+    return "todas";
+  });
   const [editing, setEditing] = useState<PendingEntry | null>(null);
 
   const range = useMemo(() => {
@@ -39,12 +47,21 @@ export function PendingPaymentsPage() {
     return { from: startOfDay(from), to: today };
   }, [periodo]);
 
-  const pending = useMemo(
+  const pendingAll = useMemo(
     () => collectPendingPayments(patients, range.from, range.to),
     [patients, range]
   );
 
+  const pending = useMemo(() => {
+    if (statusFilter === "todas") return pendingAll;
+    const target = statusFilter === "pendente" ? "Pendente" : "Atrasado";
+    return pendingAll.filter((p) => p.row.status === target);
+  }, [pendingAll, statusFilter]);
+
   const totalValor = pending.reduce((sum, p) => sum + p.row.valor, 0);
+  const atrasadosCount = pendingAll.filter(
+    (p) => p.row.status === "Atrasado"
+  ).length;
 
   const handleMarkPaid = (entry: PendingEntry) => {
     const pagamento: Pagamento = {
@@ -81,13 +98,21 @@ export function PendingPaymentsPage() {
         ? "nos últimos 3 meses"
         : "no histórico completo";
 
+  const statusLabel =
+    statusFilter === "pendente"
+      ? "pendentes"
+      : statusFilter === "atrasado"
+        ? "atrasadas"
+        : "a receber";
+
   return (
     <>
       <div className="page-hero">
         <div className="page-eyebrow">Financeiro</div>
         <h1 className="page-title">Pagamentos pendentes</h1>
         <p className="page-subtitle">
-          Todas as sessões {periodLabel} que ainda não foram quitadas.
+          Sessões {statusLabel} {periodLabel}. Atrasadas são as que tiveram o
+          mês virado sem pagamento.
         </p>
       </div>
 
@@ -95,30 +120,52 @@ export function PendingPaymentsPage() {
         <div className="pending-summary">
           <strong>{pending.length}</strong>
           <span>
-            {pending.length === 1 ? "sessão pendente" : "sessões pendentes"}
+            {pending.length === 1 ? "sessão" : "sessões"} · {statusLabel}
           </span>
           <span className="dot">·</span>
           <strong>{formatCurrency(totalValor)}</strong>
           <span>a receber</span>
+          {atrasadosCount > 0 && statusFilter === "todas" && (
+            <>
+              <span className="dot">·</span>
+              <span className="pending-overdue-badge">
+                {atrasadosCount}{" "}
+                {atrasadosCount === 1 ? "atrasada" : "atrasadas"}
+              </span>
+            </>
+          )}
         </div>
-        <Select<Periodo>
-          value={periodo}
-          onChange={(v) => setPeriodo(v)}
-          options={[
-            { value: "mes", label: "Mês atual" },
-            { value: "3meses", label: "Últimos 3 meses" },
-            { value: "tudo", label: "Histórico completo" },
-          ]}
-          ariaLabel="Período"
-          className="pending-period"
-        />
+        <div className="pending-filters">
+          <Select<StatusFilter>
+            value={statusFilter}
+            onChange={(v) => setStatusFilter(v)}
+            options={[
+              { value: "todas", label: "Todas a receber" },
+              { value: "pendente", label: "Somente pendentes" },
+              { value: "atrasado", label: "Somente atrasadas" },
+            ]}
+            ariaLabel="Status"
+            className="pending-status"
+          />
+          <Select<Periodo>
+            value={periodo}
+            onChange={(v) => setPeriodo(v)}
+            options={[
+              { value: "mes", label: "Mês atual" },
+              { value: "3meses", label: "Últimos 3 meses" },
+              { value: "tudo", label: "Histórico completo" },
+            ]}
+            ariaLabel="Período"
+            className="pending-period"
+          />
+        </div>
       </div>
 
       {pending.length === 0 ? (
         <div className="pending-empty">
           <strong>Tudo em dia!</strong>
           <span>
-            Nenhuma sessão pendente {periodLabel}. Bom trabalho.
+            Nenhuma sessão {statusLabel} {periodLabel}. Bom trabalho.
           </span>
         </div>
       ) : (
@@ -132,7 +179,13 @@ export function PendingPaymentsPage() {
               "0"
             )}/${String(entry.row.date.getMonth() + 1).padStart(2, "0")}/${entry.row.date.getFullYear()}`;
             return (
-              <li key={`${entry.patient.id}-${entry.row.key}`} className="pending-row">
+              <li
+                key={`${entry.patient.id}-${entry.row.key}`}
+                className={
+                  "pending-row" +
+                  (entry.row.status === "Atrasado" ? " is-overdue" : "")
+                }
+              >
                 <div className="pending-patient">
                   <button
                     type="button"
@@ -163,6 +216,17 @@ export function PendingPaymentsPage() {
                   <span className="pending-date">{dataLabel}</span>
                   <span className="pending-dw">
                     {dia?.short} · {entry.row.horario}
+                  </span>
+                </div>
+
+                <div className="pending-status-cell">
+                  <span
+                    className={
+                      "payment-badge " +
+                      (entry.row.status === "Atrasado" ? "late" : "pending")
+                    }
+                  >
+                    {entry.row.status}
                   </span>
                 </div>
 
