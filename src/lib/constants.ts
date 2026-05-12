@@ -1,8 +1,5 @@
 import type { DiaSemana } from "../types/patient";
 
-export const STORAGE_KEY = "pacientes_v1";
-export const SEED_FLAG = "mock_seeded_v4";
-
 export interface DiaSemanaInfo {
   val: DiaSemana;
   label: string;

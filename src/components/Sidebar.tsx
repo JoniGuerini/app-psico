@@ -1,9 +1,11 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { usePatients } from "../store/usePatients";
+import { useAuth } from "../store/useAuth";
 import { Logo } from "./Logo";
 import { collectPendingPayments } from "../lib/payments";
 import { startOfDay } from "../lib/calendar";
+import { SESSION_MODE_LABEL } from "../lib/auth";
 
 interface NavItem {
   to: string;
@@ -21,6 +23,7 @@ const NAV_ITEMS: NavItem[] = [
 
 export function Sidebar() {
   const { patients } = usePatients();
+  const { session, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -162,6 +165,29 @@ export function Sidebar() {
             <span aria-hidden="true">+</span>
             Novo paciente
           </button>
+
+          {session && (
+            <div className={`sidebar-session sidebar-session-${session.mode}`}>
+              <div className="sidebar-session-info">
+                <span className="sidebar-session-dot" aria-hidden="true" />
+                <span className="sidebar-session-label">
+                  {SESSION_MODE_LABEL[session.mode]}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="sidebar-session-logout"
+                onClick={() => {
+                  closeMobile();
+                  signOut();
+                  navigate("/login", { replace: true });
+                }}
+                aria-label="Sair"
+              >
+                Sair
+              </button>
+            </div>
+          )}
         </div>
       </aside>
     </>

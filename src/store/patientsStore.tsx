@@ -1,14 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type { Paciente, StatusPaciente } from "../types/patient";
-import { SEED_FLAG, STORAGE_KEY } from "../lib/constants";
 import { uid } from "../lib/format";
 import { seedMockData } from "../lib/seed";
+import {
+  getSeedFlag,
+  getStorageKey,
+  type SessionMode,
+} from "../lib/auth";
 import { PatientsContext, type PatientsContextValue } from "./patientsContext";
 
-const loadFromStorage = (): Paciente[] => {
+const loadFromStorage = (storageKey: string): Paciente[] => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as Paciente[];
     return Array.isArray(parsed) ? parsed : [];
@@ -17,25 +21,34 @@ const loadFromStorage = (): Paciente[] => {
   }
 };
 
-const persist = (list: Paciente[]) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+const persist = (storageKey: string, list: Paciente[]) => {
+  localStorage.setItem(storageKey, JSON.stringify(list));
 };
 
-export function PatientsProvider({ children }: { children: ReactNode }) {
+export function PatientsProvider({
+  children,
+  mode,
+}: {
+  children: ReactNode;
+  mode: SessionMode;
+}) {
+  const storageKey = getStorageKey(mode);
+  const seedFlag = getSeedFlag(mode);
+
   const [patients, setPatients] = useState<Paciente[]>(() => {
     if (typeof window === "undefined") return [];
-    let list = loadFromStorage();
-    if (!localStorage.getItem(SEED_FLAG)) {
+    let list = loadFromStorage(storageKey);
+    if (seedFlag && !localStorage.getItem(seedFlag)) {
       list = seedMockData();
-      persist(list);
-      localStorage.setItem(SEED_FLAG, "1");
+      persist(storageKey, list);
+      localStorage.setItem(seedFlag, "1");
     }
     return list;
   });
 
   useEffect(() => {
-    persist(patients);
-  }, [patients]);
+    persist(storageKey, patients);
+  }, [patients, storageKey]);
 
   const getById = useCallback(
     (id: string) => patients.find((p) => p.id === id),
