@@ -359,6 +359,16 @@ button {
   color: var(--azul-escuro);
 }
 
+.sidebar-nav-badge-warn {
+  background: rgba(217, 138, 76, 0.22);
+  color: #f0bb8a;
+}
+
+.sidebar-nav-link.active .sidebar-nav-badge-warn {
+  background: rgba(165, 90, 30, 0.22);
+  color: #8a4715;
+}
+
 .sidebar-footer {
   margin-top: auto;
   padding-top: 12px;

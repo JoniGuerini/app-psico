@@ -1,7 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { usePatients } from "../store/usePatients";
 import { Logo } from "./Logo";
+import { collectPendingPayments, monthRange } from "../lib/payments";
+import { startOfDay } from "../lib/calendar";
 
 interface NavItem {
   to: string;
@@ -13,6 +15,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/", label: "Início", end: true },
   { to: "/pacientes", label: "Pacientes", end: true },
   { to: "/agenda", label: "Agenda" },
+  { to: "/pagamentos/pendentes", label: "Pagamentos" },
 ];
 
 export function Sidebar() {
@@ -24,6 +27,13 @@ export function Sidebar() {
   const indicatorRef = useRef<HTMLSpanElement | null>(null);
 
   const closeMobile = () => setMobileOpen(false);
+
+  // Contagem de sessões pendentes no mês atual (badge da Sidebar)
+  const pendingCount = useMemo(() => {
+    const today = startOfDay(new Date());
+    const { from } = monthRange(today);
+    return collectPendingPayments(patients, from, today).length;
+  }, [patients]);
 
   // Trava o scroll do body enquanto o drawer está aberto
   useEffect(() => {
@@ -61,7 +71,7 @@ export function Sidebar() {
     });
     ro.observe(nav);
     return () => ro.disconnect();
-  }, [location.pathname, mobileOpen, patients.length]);
+  }, [location.pathname, mobileOpen, patients.length, pendingCount]);
 
   return (
     <>
@@ -126,6 +136,11 @@ export function Sidebar() {
               <span className="sidebar-nav-label">{item.label}</span>
               {item.to === "/pacientes" && patients.length > 0 && (
                 <span className="sidebar-nav-badge">{patients.length}</span>
+              )}
+              {item.to === "/pagamentos/pendentes" && pendingCount > 0 && (
+                <span className="sidebar-nav-badge sidebar-nav-badge-warn">
+                  {pendingCount}
+                </span>
               )}
             </NavLink>
           ))}
