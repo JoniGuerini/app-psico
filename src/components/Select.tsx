@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 
 export interface SelectOption<T extends string | number> {
   value: T;
@@ -49,6 +50,7 @@ export function Select<T extends string | number>({
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const menuScrollerRef = useRef<HTMLDivElement>(null);
 
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
@@ -88,14 +90,14 @@ export function Select<T extends string | number>({
     }
   }, [open, openMenu]);
 
-  // Click fora fecha
+  // Click fora fecha (considera o wrapper do scroll, não só o <ul>)
   useEffect(() => {
     if (!open) return;
     const onDocClick = (e: MouseEvent) => {
       const target = e.target as Node;
       if (
         !buttonRef.current?.contains(target) &&
-        !listRef.current?.contains(target)
+        !menuScrollerRef.current?.contains(target)
       ) {
         setOpen(false);
       }
@@ -201,49 +203,66 @@ export function Select<T extends string | number>({
       </button>
 
       {open && (
-        <ul
-          ref={listRef}
-          id={listboxId}
-          role="listbox"
-          tabIndex={-1}
-          className="ui-select-menu"
+        <div
+          ref={menuScrollerRef}
+          className="ui-select-menu-wrap"
           style={menuWidth ? { minWidth: menuWidth } : undefined}
-          aria-activedescendant={
-            activeIndex >= 0 ? `${listboxId}-opt-${activeIndex}` : undefined
-          }
         >
-          {options.map((opt, i) => {
-            const isSelected = i === selectedIndex;
-            const isActive = i === activeIndex;
-            const cls = ["ui-select-option"];
-            if (isSelected) cls.push("selected");
-            if (isActive) cls.push("active");
-            if (opt.disabled) cls.push("disabled");
-            return (
-              <li
-                key={String(opt.value) + i}
-                id={`${listboxId}-opt-${i}`}
-                role="option"
-                aria-selected={isSelected}
-                aria-disabled={opt.disabled || undefined}
-                className={cls.join(" ")}
-                onMouseEnter={() => !opt.disabled && setActiveIndex(i)}
-                onMouseDown={(e) => {
-                  // mousedown pra evitar perder o foco antes de comitar
-                  e.preventDefault();
-                  if (!opt.disabled) commit(i);
-                }}
-              >
-                <span className="ui-select-option-label">{opt.label}</span>
-                {isSelected && (
-                  <span className="ui-select-option-check" aria-hidden="true">
-                    ✓
-                  </span>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+          <OverlayScrollbarsComponent
+            className="ui-select-menu-scroller"
+            options={{
+              scrollbars: {
+                theme: "os-theme-warm",
+                autoHide: "never",
+              },
+              overflow: { x: "hidden", y: "scroll" },
+            }}
+            defer
+          >
+            <ul
+              ref={listRef}
+              id={listboxId}
+              role="listbox"
+              tabIndex={-1}
+              className="ui-select-menu"
+              aria-activedescendant={
+                activeIndex >= 0 ? `${listboxId}-opt-${activeIndex}` : undefined
+              }
+            >
+              {options.map((opt, i) => {
+                const isSelected = i === selectedIndex;
+                const isActive = i === activeIndex;
+                const cls = ["ui-select-option"];
+                if (isSelected) cls.push("selected");
+                if (isActive) cls.push("active");
+                if (opt.disabled) cls.push("disabled");
+                return (
+                  <li
+                    key={String(opt.value) + i}
+                    id={`${listboxId}-opt-${i}`}
+                    role="option"
+                    aria-selected={isSelected}
+                    aria-disabled={opt.disabled || undefined}
+                    className={cls.join(" ")}
+                    onMouseEnter={() => !opt.disabled && setActiveIndex(i)}
+                    onMouseDown={(e) => {
+                      // mousedown pra evitar perder o foco antes de comitar
+                      e.preventDefault();
+                      if (!opt.disabled) commit(i);
+                    }}
+                  >
+                    <span className="ui-select-option-label">{opt.label}</span>
+                    {isSelected && (
+                      <span className="ui-select-option-check" aria-hidden="true">
+                        ✓
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </OverlayScrollbarsComponent>
+        </div>
       )}
     </div>
   );

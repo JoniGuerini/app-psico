@@ -1,4 +1,11 @@
-import type { Paciente, DiaSemana, Modalidade, TipoPaciente, StatusPaciente } from "../types/patient";
+import type {
+  Paciente,
+  Agendamento,
+  DiaSemana,
+  Modalidade,
+  TipoPaciente,
+  StatusPaciente,
+} from "../types/patient";
 import { uid } from "./format";
 
 interface EnderecoSeed {
@@ -35,6 +42,26 @@ const NOMES: Array<[string, string]> = [
   ["Marina Dias Borges", "Feminino"],
   ["Nicolas Cunha Faria", "Masculino"],
   ["Patricia Moreira Lima", "Feminino"],
+  ["Vinícius Ramos Castro", "Masculino"],
+  ["Bianca Tavares Soares", "Feminino"],
+  ["Thiago Nunes Almeida", "Masculino"],
+  ["Letícia Vasconcelos Lima", "Feminino"],
+  ["Matheus Cordeiro Pinto", "Masculino"],
+  ["Sofia Brandão Reis", "Feminino"],
+  ["Henrique Vieira Aragão", "Masculino"],
+  ["Yasmin Borges Carvalho", "Feminino"],
+  ["Rodrigo Oliveira Tavares", "Masculino"],
+  ["Manuela Câmara Souza", "Feminino"],
+  ["Otávio Pacheco Mello", "Masculino"],
+  ["Valentina Andrade Lopes", "Feminino"],
+  ["Caio Marinho Duarte", "Masculino"],
+  ["Antonia Furtado Rocha", "Feminino"],
+  ["Bernardo Pinto Cunha", "Masculino"],
+  ["Lívia Cardoso Brandão", "Feminino"],
+  ["Murilo Antunes Maia", "Masculino"],
+  ["Sara Nogueira Britto", "Feminino"],
+  ["Davi Macedo Teixeira", "Masculino"],
+  ["Cecília Ramos Negrão", "Feminino"],
 ];
 
 const ENDERECOS: EnderecoSeed[] = [
@@ -78,6 +105,9 @@ const TIPOS: TipoPaciente[] = [
   "Recorrente",
   "Primeira entrevista",
 ];
+
+// Slots disponíveis: segunda a sexta, horários redondos das 08h às 19h.
+// (Sem 12-13, intervalo de almoço.)
 const HORARIOS = [
   "08:00",
   "09:00",
@@ -90,7 +120,9 @@ const HORARIOS = [
   "18:00",
   "19:00",
 ];
-const DURACOES_M = [50, 50, 50, 50, 60, 45];
+const DIAS_UTEIS: DiaSemana[] = [1, 2, 3, 4, 5];
+
+const DURACOES_M = [50, 50, 50, 50, 45, 60];
 const VALORES = [200, 250, 300, 350, 400, 250, 300];
 const OBS = [
   "Apresenta quadro de ansiedade leve. Foco no manejo de pensamentos automáticos.",
@@ -100,7 +132,7 @@ const OBS = [
   "Sessões focadas em autoestima e autocuidado.",
   "Uso de medicação supervisionada por psiquiatra parceiro.",
 ];
-const INATIVOS = [8, 17, 22];
+const INATIVOS = new Set([8, 17, 22, 28, 33, 38, 42]);
 
 const pad2 = (n: number): string => String(n).padStart(2, "0");
 
@@ -136,9 +168,68 @@ const emailFromName = (nome: string): string => {
   return `${parts[0]}.${parts[parts.length - 1]}@email.com`;
 };
 
+const slotKey = (dia: DiaSemana, horario: string): string => `${dia}-${horario}`;
+
+/**
+ * Gera N agendamentos pra um paciente, garantindo que nenhum (dia, horário)
+ * já esteja em uso pelo conjunto global `usedSlots`. Determinístico por `seedI`.
+ */
+const makeAgendamentos = (
+  seedI: number,
+  modalidadeBase: Modalidade,
+  usedSlots: Set<string>
+): Agendamento[] => {
+  // Distribuição: 60% com 1 sessão/sem, 30% com 2, 10% com 3
+  const r = seedI % 10;
+  const n = r < 6 ? 1 : r < 9 ? 2 : 3;
+
+  const result: Agendamento[] = [];
+  for (let s = 0; s < n; s++) {
+    let found: { dia: DiaSemana; horario: string } | null = null;
+    const total = HORARIOS.length * DIAS_UTEIS.length;
+    for (let attempt = 0; attempt < total; attempt++) {
+      const di = (seedI * 3 + s * 7 + attempt * 11) % DIAS_UTEIS.length;
+      const hi = (seedI * 5 + s * 13 + attempt * 3) % HORARIOS.length;
+      const dia = DIAS_UTEIS[di];
+      const horario = HORARIOS[hi];
+      const k = slotKey(dia, horario);
+      if (!usedSlots.has(k)) {
+        usedSlots.add(k);
+        found = { dia, horario };
+        break;
+      }
+    }
+    if (!found) break; // pool esgotado
+
+    // Algumas sessões variam a modalidade pra ficar realista
+    const indivMod: Modalidade =
+      s === 0
+        ? modalidadeBase
+        : (seedI + s) % 3 === 0
+          ? MODALIDADES[(seedI + s * 2) % 3]
+          : modalidadeBase;
+
+    result.push({
+      diaSemana: found.dia,
+      horario: found.horario,
+      duracao: DURACOES_M[(seedI + s) % DURACOES_M.length],
+      modalidade: indivMod,
+    });
+  }
+
+  // Ordena por dia/horário pra ficar mais limpo no perfil do paciente
+  result.sort((a, b) => {
+    if (a.diaSemana !== b.diaSemana) return Number(a.diaSemana) - Number(b.diaSemana);
+    return a.horario.localeCompare(b.horario);
+  });
+
+  return result;
+};
+
 export const seedMockData = (): Paciente[] => {
   const today = new Date();
   const yearNow = today.getFullYear();
+  const usedSlots = new Set<string>();
 
   return NOMES.map(([nome, genero], i) => {
     const idade = 22 + ((i * 7) % 38);
@@ -146,7 +237,7 @@ export const seedMockData = (): Paciente[] => {
 
     const e = ENDERECOS[i % ENDERECOS.length];
     const tipoPaciente = TIPOS[i % TIPOS.length];
-    const status: StatusPaciente = INATIVOS.includes(i) ? "Inativo" : "Ativo";
+    const status: StatusPaciente = INATIVOS.has(i) ? "Inativo" : "Ativo";
     const modalidade = MODALIDADES[i % 3];
     const valorSessao = VALORES[i % VALORES.length];
     const indicacao = INDICACOES[i % INDICACOES.length];
@@ -155,22 +246,8 @@ export const seedMockData = (): Paciente[] => {
     const dInicio = new Date(today.getFullYear(), today.getMonth() - monthsAgo, today.getDate());
     const dataInicioTerapia = dInicio.toISOString().slice(0, 10);
 
-    const agendamentos = [];
-    const incluir = status === "Ativo" && (tipoPaciente === "Recorrente" || i % 2 === 0);
-    if (incluir) {
-      agendamentos.push({
-        diaSemana: (i % 7) as DiaSemana,
-        horario: HORARIOS[i % HORARIOS.length],
-        duracao: DURACOES_M[i % DURACOES_M.length],
-      });
-      if (i % 5 === 0) {
-        agendamentos.push({
-          diaSemana: ((i + 3) % 7) as DiaSemana,
-          horario: HORARIOS[(i + 4) % HORARIOS.length],
-          duracao: 50,
-        });
-      }
-    }
+    const agendamentos =
+      status === "Ativo" ? makeAgendamentos(i, modalidade, usedSlots) : [];
 
     const hasContato = i % 3 === 0;
     const criadoEm = new Date(

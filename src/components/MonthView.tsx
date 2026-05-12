@@ -12,7 +12,8 @@ import { DayTooltip } from "./DayTooltip";
 
 const WEEKDAY_LABELS_SUN = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 
-const HOVER_DELAY_MS = 180;
+const HOVER_OPEN_DELAY_MS = 180;
+const HOVER_CLOSE_DELAY_MS = 160;
 
 interface MonthViewProps {
   patients: Paciente[];
@@ -52,6 +53,7 @@ export function MonthView({ patients, cursor, onSelectDate }: MonthViewProps) {
 
   const [hover, setHover] = useState<HoverInfo | null>(null);
   const showTimerRef = useRef<number | null>(null);
+  const hideTimerRef = useRef<number | null>(null);
 
   const cancelShowTimer = () => {
     if (showTimerRef.current != null) {
@@ -60,17 +62,40 @@ export function MonthView({ patients, cursor, onSelectDate }: MonthViewProps) {
     }
   };
 
+  const cancelHideTimer = () => {
+    if (hideTimerRef.current != null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  };
+
   const openHover = (date: Date, sessions: SessionInstance[], el: HTMLElement) => {
     if (sessions.length === 0) return;
+    cancelHideTimer();
     cancelShowTimer();
     showTimerRef.current = window.setTimeout(() => {
       const rect = el.getBoundingClientRect();
       setHover({ date, sessions, anchorRect: rect });
-    }, HOVER_DELAY_MS);
+    }, HOVER_OPEN_DELAY_MS);
   };
 
-  const closeHover = () => {
+  // Fechamento "preguiçoso" — dá tempo do mouse atravessar o gap
+  // entre o card do dia e o tooltip sem ele fechar.
+  const scheduleClose = () => {
     cancelShowTimer();
+    cancelHideTimer();
+    hideTimerRef.current = window.setTimeout(() => {
+      setHover(null);
+    }, HOVER_CLOSE_DELAY_MS);
+  };
+
+  const keepOpen = () => {
+    cancelHideTimer();
+  };
+
+  const closeNow = () => {
+    cancelShowTimer();
+    cancelHideTimer();
     setHover(null);
   };
 
@@ -100,9 +125,9 @@ export function MonthView({ patients, cursor, onSelectDate }: MonthViewProps) {
               className={cls.join(" ")}
               onClick={() => onSelectDate(d)}
               onMouseEnter={(e) => openHover(d, sessions, e.currentTarget)}
-              onMouseLeave={closeHover}
+              onMouseLeave={scheduleClose}
               onFocus={(e) => openHover(d, sessions, e.currentTarget)}
-              onBlur={closeHover}
+              onBlur={closeNow}
               aria-label={`${d.getDate()} de ${d.toLocaleDateString("pt-BR", {
                 month: "long",
               })}${
@@ -127,6 +152,8 @@ export function MonthView({ patients, cursor, onSelectDate }: MonthViewProps) {
           date={hover.date}
           sessions={hover.sessions}
           anchorRect={hover.anchorRect}
+          onMouseEnter={keepOpen}
+          onMouseLeave={scheduleClose}
         />
       )}
     </div>

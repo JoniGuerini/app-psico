@@ -42,6 +42,98 @@ body {
   overscroll-behavior: none;
 }
 
+/* ===== SCROLLBAR (universal, DOM-based via OverlayScrollbars) =====
+   A barra do app é desenhada por <div>s, não pelo SO. Sem setinhas,
+   sem visual nativo. Cores em sintonia com a paleta creme/taupe. */
+:root {
+  --sb-thumb: rgba(91, 76, 50, 0.32);
+  --sb-thumb-hover: rgba(91, 76, 50, 0.5);
+  --sb-thumb-active: rgba(91, 76, 50, 0.65);
+  --sb-thumb-dark: rgba(245, 239, 224, 0.3);
+  --sb-thumb-dark-hover: rgba(245, 239, 224, 0.5);
+  --sb-thumb-dark-active: rgba(245, 239, 224, 0.65);
+}
+
+/* Tema warm aplicado em qualquer container OverlayScrollbars */
+.os-theme-warm {
+  --os-size: 12px;
+  --os-padding-axis: 3px;
+  --os-padding-perpendicular: 3px;
+  --os-handle-interactive-area-offset: 3px;
+  --os-handle-border-radius: 999px;
+  --os-handle-min-size: 36px;
+  --os-handle-bg: var(--sb-thumb);
+  --os-handle-bg-hover: var(--sb-thumb-hover);
+  --os-handle-bg-active: var(--sb-thumb-active);
+}
+
+/* Variante clara pra fundos escuros (ex.: sidebar, se rolar) */
+.os-theme-warm-dark {
+  --os-size: 12px;
+  --os-padding-axis: 3px;
+  --os-padding-perpendicular: 3px;
+  --os-handle-interactive-area-offset: 3px;
+  --os-handle-border-radius: 999px;
+  --os-handle-min-size: 36px;
+  --os-handle-bg: var(--sb-thumb-dark);
+  --os-handle-bg-hover: var(--sb-thumb-dark-hover);
+  --os-handle-bg-active: var(--sb-thumb-dark-active);
+}
+
+/* Fallback discreto pros poucos containers que ainda usem scroll nativo
+   (mantém a estética caso algum lugar não seja envolvido por OS).
+   Sem setinhas, thumb warm-taupe, track invisível. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-thumb) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-track-piece {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  min-height: 36px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sb-thumb-hover);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--sb-thumb-active);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-button:single-button,
+::-webkit-scrollbar-button:start:decrement,
+::-webkit-scrollbar-button:end:increment,
+::-webkit-scrollbar-button:vertical:start:decrement,
+::-webkit-scrollbar-button:vertical:end:increment,
+::-webkit-scrollbar-button:horizontal:start:decrement,
+::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 button {
   font-family: inherit;
 }
@@ -2001,32 +2093,31 @@ select.invalid {
   box-shadow: var(--sombra-forte);
   padding: 12px 14px;
   animation: tooltipIn 0.14s ease both;
-  pointer-events: none;
 }
 
 @keyframes tooltipIn {
   from {
     opacity: 0;
-    transform: translateY(-2px);
+    transform: translateX(-4px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }
 
-.day-tooltip.flip-up {
-  animation-name: tooltipInUp;
+.day-tooltip.flip-left {
+  animation-name: tooltipInLeft;
 }
 
-@keyframes tooltipInUp {
+@keyframes tooltipInLeft {
   from {
     opacity: 0;
-    transform: translateY(2px);
+    transform: translateX(4px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }
 
@@ -2057,15 +2148,18 @@ select.invalid {
   white-space: nowrap;
 }
 
+.day-tooltip .dt-list-scroller {
+  max-height: 420px;
+}
+
 .day-tooltip .dt-list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  /* reserva espaço à direita pra barra warm não sobrepor os cards */
+  padding: 0 18px 0 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 280px;
-  overflow-y: auto;
 }
 
 .day-tooltip .dt-item {
@@ -2638,21 +2732,29 @@ select.invalid {
   color: var(--azul-escuro);
 }
 
-.ui-select-menu {
+.ui-select-menu-wrap {
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
   z-index: 80;
-  list-style: none;
-  margin: 0;
-  padding: 4px;
   background: var(--creme-claro);
   border: 1px solid var(--borda);
   border-radius: 12px;
   box-shadow: var(--sombra-forte);
-  max-height: 280px;
-  overflow-y: auto;
+  padding: 4px;
   animation: selectMenuIn 0.14s ease;
+  overflow: hidden;
+}
+
+.ui-select-menu-scroller {
+  max-height: 280px;
+}
+
+.ui-select-menu {
+  list-style: none;
+  margin: 0;
+  /* reserva espaço à direita pra barra warm não sobrepor as opções */
+  padding: 0 18px 0 0;
 }
 
 @keyframes selectMenuIn {
