@@ -10,6 +10,7 @@ import { CalendarPage } from "./pages/CalendarPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { PendingPaymentsPage } from "./pages/PendingPaymentsPage";
 import { RecentPatientsPage } from "./pages/RecentPatientsPage";
+import { FinancialDashboardPage } from "./pages/FinancialDashboardPage";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
               <Route path="/pacientes/:id" element={<ProfilePage />} />
               <Route path="/pacientes/:id/editar" element={<ProfilePage />} />
               <Route path="/agenda" element={<CalendarPage />} />
+              <Route path="/financeiro" element={<FinancialDashboardPage />} />
               <Route
                 path="/pagamentos/pendentes"
                 element={<PendingPaymentsPage />}

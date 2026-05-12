@@ -15,6 +15,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/", label: "Início", end: true },
   { to: "/pacientes", label: "Pacientes", end: true },
   { to: "/agenda", label: "Agenda" },
+  { to: "/financeiro", label: "Financeiro" },
   { to: "/pagamentos/pendentes", label: "Pagamentos" },
 ];
 

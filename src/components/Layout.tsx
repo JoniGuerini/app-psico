@@ -15,6 +15,10 @@ const REVEAL_SELECTORS = [
   ".recent-page-list > *",
   ".calendar-shell",
   ".calendar-shell + *",
+  ".fin-toolbar",
+  ".fin-kpis > .fin-kpi",
+  ".fin-tax",
+  ".fin-section",
 ].join(", ");
 
 const reduceMotion = () =>

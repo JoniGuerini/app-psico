@@ -41,6 +41,132 @@ export const monthRange = (cursor: Date): { from: Date; to: Date } => {
   return { from: startOfDay(from), to: startOfDay(to) };
 };
 
+/** Visão financeira agregada (totais em valor + contagem por status). */
+export interface FinancialOverview extends PaymentTotals {
+  /** Top pacientes em atraso (ordenados por valor atrasado, decrescente). */
+  topAtrasados: Array<{ patient: Paciente; valor: number; count: number }>;
+  /** Distribuição de pagamentos pagos por método de pagamento. */
+  porMetodo: Array<{ metodo: string; valor: number; count: number }>;
+  /** Série mensal — últimos N meses do intervalo, em ordem cronológica. */
+  serieMensal: Array<{
+    label: string;
+    year: number;
+    month: number;
+    pago: number;
+    pendente: number;
+    atrasado: number;
+    agendada: number;
+  }>;
+}
+
+/**
+ * Calcula a visão financeira consolidada (todos os pacientes ativos)
+ * dentro do intervalo. A série mensal é uma agregação por mês entre
+ * `from` e `to`, útil pra renderizar gráfico de barras.
+ */
+export const computeFinancialOverview = (
+  patients: Paciente[],
+  from: Date,
+  to: Date
+): FinancialOverview => {
+  const allRows: { row: PaymentRow; patient: Paciente }[] = [];
+  patients.forEach((p) => {
+    if (p.status !== "Ativo") return;
+    generatePaymentRows(p, from, to).forEach((row) => {
+      allRows.push({ row, patient: p });
+    });
+  });
+
+  const totals = computeTotals(allRows.map((r) => r.row));
+
+  // Top atrasados por paciente
+  const atrasadosByPatient = new Map<
+    string,
+    { patient: Paciente; valor: number; count: number }
+  >();
+  allRows.forEach(({ row, patient }) => {
+    if (row.status !== "Atrasado") return;
+    const cur = atrasadosByPatient.get(patient.id) ?? {
+      patient,
+      valor: 0,
+      count: 0,
+    };
+    cur.valor += row.valor;
+    cur.count += 1;
+    atrasadosByPatient.set(patient.id, cur);
+  });
+  const topAtrasados = Array.from(atrasadosByPatient.values()).sort(
+    (a, b) => b.valor - a.valor
+  );
+
+  // Distribuição por método (apenas Pago, com método informado)
+  const metodoMap = new Map<string, { valor: number; count: number }>();
+  allRows.forEach(({ row }) => {
+    if (row.status !== "Pago") return;
+    const metodo = row.pagamento?.metodo ?? "Não informado";
+    const cur = metodoMap.get(metodo) ?? { valor: 0, count: 0 };
+    cur.valor += row.valor;
+    cur.count += 1;
+    metodoMap.set(metodo, cur);
+  });
+  const porMetodo = Array.from(metodoMap.entries())
+    .map(([metodo, v]) => ({ metodo, ...v }))
+    .sort((a, b) => b.valor - a.valor);
+
+  // Série mensal — varre meses entre from e to (inclusivo)
+  const serieMensal: FinancialOverview["serieMensal"] = [];
+  const startCursor = new Date(from.getFullYear(), from.getMonth(), 1);
+  const endCursor = new Date(to.getFullYear(), to.getMonth(), 1);
+  const monthLabels = [
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez",
+  ];
+  for (
+    let m = new Date(startCursor);
+    m.getTime() <= endCursor.getTime();
+    m = new Date(m.getFullYear(), m.getMonth() + 1, 1)
+  ) {
+    serieMensal.push({
+      label: `${monthLabels[m.getMonth()]}/${String(m.getFullYear()).slice(-2)}`,
+      year: m.getFullYear(),
+      month: m.getMonth(),
+      pago: 0,
+      pendente: 0,
+      atrasado: 0,
+      agendada: 0,
+    });
+  }
+  const findMonth = (d: Date) =>
+    serieMensal.find(
+      (s) => s.year === d.getFullYear() && s.month === d.getMonth()
+    );
+  allRows.forEach(({ row }) => {
+    const bucket = findMonth(row.date);
+    if (!bucket) return;
+    if (row.status === "Pago") bucket.pago += row.valor;
+    else if (row.status === "Pendente") bucket.pendente += row.valor;
+    else if (row.status === "Atrasado") bucket.atrasado += row.valor;
+    else if (row.status === "Agendada") bucket.agendada += row.valor;
+  });
+
+  return {
+    ...totals,
+    topAtrasados,
+    porMetodo,
+    serieMensal,
+  };
+};
+
 /**
  * Gera linhas de sessões previstas para um paciente, no intervalo [from..to]
  * (inclusivo nos dois lados), com base nos agendamentos recorrentes

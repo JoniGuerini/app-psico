@@ -3103,6 +3103,714 @@ select.invalid {
   vertical-align: middle;
 }
 
+/* ================ DASHBOARD FINANCEIRO ================ */
+
+.fin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+  /* Acima dos KPIs (que viram stacking contexts via .reveal/transform) */
+  position: relative;
+  z-index: 60;
+}
+
+.fin-toolbar-info {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.fin-toolbar-info strong {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--azul-escuro);
+}
+
+.fin-toolbar-info .dot {
+  color: var(--borda);
+  margin: 0 4px;
+}
+
+.fin-period {
+  max-width: 220px;
+}
+
+.fin-kpis {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 1280px) {
+  .fin-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .fin-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.fin-kpi {
+  background: white;
+  border: 1px solid var(--borda-suave);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: inherit;
+  text-align: left;
+  min-width: 0;
+}
+
+.fin-kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fin-kpi-value {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--azul-escuro);
+  line-height: 1.1;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fin-kpi-meta {
+  font-size: 12px;
+  color: var(--texto-suave);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1440px) {
+  .fin-kpi-value {
+    font-size: 20px;
+  }
+}
+
+.fin-kpi-previsto {
+  background: var(--azul-suave);
+  border-color: #d0dceb;
+}
+
+.fin-kpi-recebido {
+  background: var(--verde-suave);
+  border-color: #c4dec9;
+}
+
+.fin-kpi-recebido .fin-kpi-value {
+  color: #2f6f49;
+}
+
+.fin-kpi-pendente {
+  background: #fdf6ea;
+  border-color: #e8d6b0;
+}
+
+.fin-kpi-pendente .fin-kpi-value {
+  color: #8a5a1a;
+}
+
+.fin-kpi-atrasado {
+  background: #fcecec;
+  border-color: #e7bdbd;
+}
+
+.fin-kpi-atrasado .fin-kpi-value {
+  color: #8b1f1f;
+}
+
+.fin-kpi-agendado {
+  background: #fbfcfe;
+  border-color: #d8e1ec;
+}
+
+.fin-kpi-agendado .fin-kpi-value {
+  color: var(--azul-medio);
+}
+
+.fin-kpi-inadimplencia {
+  background: #faf5e8;
+  border-color: #e0d4ad;
+}
+
+.fin-kpi-clickable {
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.fin-kpi-clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--sombra);
+}
+
+.fin-kpi-atrasado.fin-kpi-clickable.is-active:hover {
+  border-color: #c25c5c;
+}
+
+/* ====== TRIBUTAÇÃO ====== */
+
+.fin-tax {
+  background: white;
+  border: 1px solid var(--borda-suave);
+  border-radius: 18px;
+  padding: 22px 24px;
+  margin-bottom: 18px;
+  /* Acima da grid abaixo (cujas seções viram stacking contexts via .reveal) */
+  position: relative;
+  z-index: 40;
+}
+
+.fin-tax-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.fin-tax-header h2 {
+  font-family: "Fraunces", serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--azul-escuro);
+  margin: 0 0 4px;
+}
+
+.fin-tax-header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+  max-width: 540px;
+}
+
+.fin-tax-config {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.fin-tax-preset {
+  min-width: 280px;
+}
+
+.fin-tax-custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--creme-claro);
+  border: 1px solid var(--borda-suave);
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.fin-tax-custom input {
+  width: 64px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--azul-escuro);
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: right;
+  padding: 4px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.fin-tax-custom .suffix {
+  font-weight: 600;
+  color: var(--azul-escuro);
+}
+
+.fin-tax-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 980px) {
+  .fin-tax-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 540px) {
+  .fin-tax-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fin-tax-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--creme-claro);
+  border: 1px solid var(--borda-suave);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.fin-tax-aliquota {
+  background: var(--azul-suave);
+  border-color: #d0dceb;
+}
+
+.fin-tax-imposto {
+  background: #fcecec;
+  border-color: #e7bdbd;
+}
+
+.fin-tax-imposto .fin-kpi-value {
+  color: #8b1f1f;
+}
+
+.fin-tax-liquido {
+  background: var(--verde-suave);
+  border-color: #c4dec9;
+}
+
+.fin-tax-liquido .fin-kpi-value {
+  color: #2f6f49;
+}
+
+.fin-tax-projetado {
+  background: #fbfcfe;
+  border-color: #d8e1ec;
+}
+
+.fin-tax-projetado .fin-kpi-value {
+  color: var(--azul-medio);
+}
+
+/* ====== GRID DE SEÇÕES ====== */
+
+.fin-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    "chart chart"
+    "top   metodos";
+  gap: 18px;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .fin-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "chart"
+      "top"
+      "metodos";
+  }
+}
+
+.fin-section {
+  background: white;
+  border: 1px solid var(--borda-suave);
+  border-radius: 18px;
+  padding: 22px 24px;
+}
+
+.fin-section-header {
+  margin-bottom: 18px;
+}
+
+.fin-section-header h2 {
+  font-family: "Fraunces", serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--azul-escuro);
+  margin: 0 0 4px;
+}
+
+.fin-section-header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.fin-chart-section {
+  grid-area: chart;
+  align-self: start;
+}
+
+.fin-top-atrasados {
+  grid-area: top;
+  align-self: start;
+}
+
+.fin-metodos {
+  grid-area: metodos;
+  align-self: start;
+}
+
+.fin-empty {
+  padding: 36px 12px;
+  text-align: center;
+  color: var(--texto-suave);
+  background: var(--creme-claro);
+  border: 1px dashed var(--borda-suave);
+  border-radius: 12px;
+}
+
+/* ====== GRÁFICO DE BARRAS ====== */
+
+.fin-chart {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 14px;
+  align-items: end;
+  min-height: 240px;
+  padding: 12px 4px 0;
+  border-bottom: 1px solid var(--borda-suave);
+}
+
+.fin-chart-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.fin-chart-bars {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.fin-chart-stack {
+  width: 70%;
+  max-width: 72px;
+  height: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  background: var(--creme-claro);
+}
+
+.fin-bar {
+  width: 100%;
+  transition: opacity 0.15s ease;
+}
+
+.fin-bar:hover {
+  opacity: 0.85;
+}
+
+.fin-bar-pago {
+  background: var(--verde-medio);
+}
+
+.fin-bar-pendente {
+  background: #d9a44c;
+}
+
+.fin-bar-atrasado {
+  background: #c25c5c;
+}
+
+.fin-bar-agendada {
+  background: var(--azul-medio);
+  opacity: 0.55;
+}
+
+.fin-chart-total {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--azul-escuro);
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+}
+
+.fin-chart-label {
+  font-size: 11px;
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fin-chart-legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding-top: 14px;
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.swatch-pago {
+  background: var(--verde-medio);
+}
+
+.swatch-pendente {
+  background: #d9a44c;
+}
+
+.swatch-atrasado {
+  background: #c25c5c;
+}
+
+.swatch-agendada {
+  background: var(--azul-medio);
+  opacity: 0.55;
+}
+
+/* ====== TOOLTIP DO GRÁFICO ====== */
+
+.fin-chart-tooltip {
+  position: fixed;
+  z-index: 200;
+  transform: translate(14px, -50%);
+  pointer-events: none;
+  background: var(--azul-escuro);
+  color: white;
+  padding: 10px 12px;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(20, 30, 48, 0.28);
+  min-width: 180px;
+  max-width: 260px;
+  font-size: 12px;
+  line-height: 1.35;
+  animation: fin-chart-tooltip-in 0.12s ease;
+}
+
+.fin-chart-tooltip.is-flipped {
+  transform: translate(calc(-100% - 14px), -50%);
+  animation: fin-chart-tooltip-in-left 0.12s ease;
+}
+
+@keyframes fin-chart-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translate(8px, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(14px, -50%);
+  }
+}
+
+@keyframes fin-chart-tooltip-in-left {
+  from {
+    opacity: 0;
+    transform: translate(calc(-100% - 8px), -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(calc(-100% - 14px), -50%);
+  }
+}
+
+.fin-chart-tooltip-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.fin-chart-tooltip-head strong {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.fin-chart-tooltip-mes {
+  margin-left: auto;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.fin-chart-tooltip-valor {
+  font-family: "Fraunces", serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 2px;
+}
+
+.fin-chart-tooltip-meta {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+}
+
+/* ====== TOP ATRASADOS ====== */
+
+.fin-top-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fin-top-button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.fin-top-button:hover {
+  background: var(--creme-claro);
+  border-color: var(--borda-suave);
+}
+
+.fin-top-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fin-top-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--azul-escuro);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fin-top-meta {
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+
+.fin-top-valor {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #8b1f1f;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ====== MÉTODOS DE PAGAMENTO ====== */
+
+.fin-metodo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fin-metodo-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fin-metodo-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.fin-metodo-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--azul-escuro);
+}
+
+.fin-metodo-valor {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--azul-escuro);
+  font-variant-numeric: tabular-nums;
+}
+
+.fin-metodo-bar {
+  height: 8px;
+  background: var(--creme-claro);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fin-metodo-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--verde-medio),
+    #6aa886
+  );
+  border-radius: 999px;
+}
+
+.fin-metodo-meta {
+  font-size: 11px;
+  color: var(--texto-suave);
+}
+
 .payments-toolbar {
   display: flex;
   align-items: center;
