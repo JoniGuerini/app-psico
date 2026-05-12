@@ -1,6 +1,6 @@
-# app-psico
+# Lume
 
-Aplicativo web para gerenciamento de pacientes voltado a psicólogos. Cadastro, busca, agenda semanal recorrente e dashboard em um único SPA. Os dados são persistidos no `localStorage` do navegador.
+**Sua clínica em foco.** Plataforma web de gestão clínica para psicólogos — cadastro de pacientes, agenda semanal recorrente, pagamentos por sessão e dashboard em um SPA. Os dados são persistidos no `localStorage` do navegador.
 
 > Migrado de um único arquivo HTML (legado preservado no histórico do Git) para **React + Vite + TypeScript**.
 

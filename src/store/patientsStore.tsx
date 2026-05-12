@@ -90,9 +90,77 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     return novoStatus;
   }, []);
 
+  const upsertPagamento = useCallback<PatientsContextValue["upsertPagamento"]>(
+    (patientId, pagamento) => {
+      setPatients((prev) => {
+        const idx = prev.findIndex((p) => p.id === patientId);
+        if (idx === -1) return prev;
+        const paciente = prev[idx];
+        const lista = paciente.pagamentos ?? [];
+        const key = `${pagamento.data}-${pagamento.horario}`;
+        const existingIdx = lista.findIndex(
+          (p) => `${p.data}-${p.horario}` === key
+        );
+        const nextLista =
+          existingIdx === -1
+            ? [...lista, pagamento]
+            : lista.map((p, i) =>
+                i === existingIdx ? { ...p, ...pagamento, id: p.id } : p
+              );
+        const next = prev.slice();
+        next[idx] = {
+          ...paciente,
+          pagamentos: nextLista,
+          atualizadoEm: new Date().toISOString(),
+        };
+        return next;
+      });
+    },
+    []
+  );
+
+  const removePagamento = useCallback<PatientsContextValue["removePagamento"]>(
+    (patientId, pagamentoId) => {
+      setPatients((prev) => {
+        const idx = prev.findIndex((p) => p.id === patientId);
+        if (idx === -1) return prev;
+        const paciente = prev[idx];
+        const lista = paciente.pagamentos ?? [];
+        const nextLista = lista.filter((p) => p.id !== pagamentoId);
+        if (nextLista.length === lista.length) return prev;
+        const next = prev.slice();
+        next[idx] = {
+          ...paciente,
+          pagamentos: nextLista,
+          atualizadoEm: new Date().toISOString(),
+        };
+        return next;
+      });
+    },
+    []
+  );
+
   const value = useMemo<PatientsContextValue>(
-    () => ({ patients, getById, create, update, remove, toggleStatus }),
-    [patients, getById, create, update, remove, toggleStatus]
+    () => ({
+      patients,
+      getById,
+      create,
+      update,
+      remove,
+      toggleStatus,
+      upsertPagamento,
+      removePagamento,
+    }),
+    [
+      patients,
+      getById,
+      create,
+      update,
+      remove,
+      toggleStatus,
+      upsertPagamento,
+      removePagamento,
+    ]
   );
 
   return (

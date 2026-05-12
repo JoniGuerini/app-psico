@@ -11,6 +11,8 @@ import {
   modalidadeClass,
 } from "../lib/format";
 
+const RECENT_WINDOW_DAYS = 30;
+
 export function PatientsListPage() {
   const { patients, remove } = usePatients();
   const { showToast } = useToast();
@@ -20,6 +22,15 @@ export function PatientsListPage() {
   const [filterStatus, setFilterStatus] = useState("");
   const [filterTipo, setFilterTipo] = useState("");
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+
+  const recentCount = useMemo(() => {
+    const cutoff = Date.now() - RECENT_WINDOW_DAYS * 86_400_000;
+    return patients.filter((p) => {
+      if (!p.criadoEm) return false;
+      const t = new Date(p.criadoEm).getTime();
+      return !isNaN(t) && t >= cutoff;
+    }).length;
+  }, [patients]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -55,7 +66,7 @@ export function PatientsListPage() {
 
   return (
     <>
-      <div className="stats">
+      <div className="stats patients-stats">
         <div className="stat-card">
           <div className="label">Total de pacientes</div>
           <div className="value">{patients.length}</div>
@@ -68,6 +79,16 @@ export function PatientsListPage() {
           <div className="label">Inativos</div>
           <div className="value">{inativos}</div>
         </div>
+        <button
+          type="button"
+          className="stat-card clickable"
+          onClick={() => navigate("/pacientes/recentes")}
+          aria-label="Ver cadastros recentes"
+        >
+          <div className="label">Cadastros recentes</div>
+          <div className="value">{recentCount}</div>
+          <div className="stat-sub">nos últimos {RECENT_WINDOW_DAYS} dias</div>
+        </button>
       </div>
 
       <div className="card">

@@ -3,8 +3,10 @@ import type {
   Agendamento,
   DiaSemana,
   Modalidade,
+  Pagamento,
   TipoPaciente,
   StatusPaciente,
+  MetodoPagamento,
 } from "../types/patient";
 import { uid } from "./format";
 
@@ -226,6 +228,77 @@ const makeAgendamentos = (
   return result;
 };
 
+const METODOS_MOCK: MetodoPagamento[] = ["PIX", "Dinheiro", "Cartão", "Transferência"];
+
+const dateKey = (d: Date): string => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
+/**
+ * Gera pagamentos para um paciente cobrindo os últimos ~60 dias até hoje.
+ * Sessões do mês anterior: ~75% pagas. Mês corrente até hoje: ~55% pagas.
+ * Sessões futuras: sem registro (continuam "pendentes" pela ausência).
+ */
+const generateMockPagamentos = (
+  patient: Pick<Paciente, "agendamentos" | "valorSessao" | "dataInicioTerapia">,
+  seedI: number,
+  today: Date
+): Pagamento[] => {
+  if (!patient.agendamentos?.length) return [];
+
+  const inicio = patient.dataInicioTerapia
+    ? new Date(patient.dataInicioTerapia + "T00:00:00")
+    : null;
+
+  const start = new Date(today);
+  start.setDate(start.getDate() - 60);
+  start.setHours(0, 0, 0, 0);
+
+  const result: Pagamento[] = [];
+  const cursor = new Date(start);
+  let step = 0;
+
+  while (cursor.getTime() <= today.getTime()) {
+    if (!inicio || cursor.getTime() >= inicio.getTime()) {
+      const weekday = cursor.getDay();
+      for (const a of patient.agendamentos) {
+        if (Number(a.diaSemana) !== weekday) continue;
+        if (!a.horario || !a.duracao) continue;
+
+        const isCurrentMonth =
+          cursor.getFullYear() === today.getFullYear() &&
+          cursor.getMonth() === today.getMonth();
+        const paidRatio = isCurrentMonth ? 0.55 : 0.75;
+        const pseudoRand = ((seedI * 17 + step * 31) % 100) / 100;
+        const isPaid = pseudoRand < paidRatio;
+        step += 1;
+
+        if (!isPaid) continue; // sem registro = pendente
+
+        // Data de pagamento: hoje, ou no mesmo dia ± 1
+        const pagoEm = new Date(cursor);
+        pagoEm.setHours(12 + (step % 6), 0, 0, 0);
+
+        result.push({
+          id: uid(),
+          data: dateKey(cursor),
+          horario: a.horario,
+          valor: Number(patient.valorSessao) || 0,
+          status: "Pago",
+          pagoEm: pagoEm.toISOString(),
+          metodo: METODOS_MOCK[(seedI + step) % METODOS_MOCK.length],
+        });
+      }
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return result;
+};
+
 export const seedMockData = (): Paciente[] => {
   const today = new Date();
   const yearNow = today.getFullYear();
@@ -248,6 +321,15 @@ export const seedMockData = (): Paciente[] => {
 
     const agendamentos =
       status === "Ativo" ? makeAgendamentos(i, modalidade, usedSlots) : [];
+
+    const pagamentos =
+      status === "Ativo"
+        ? generateMockPagamentos(
+            { agendamentos, valorSessao, dataInicioTerapia },
+            i,
+            today
+          )
+        : [];
 
     const hasContato = i % 3 === 0;
     const criadoEm = new Date(
@@ -279,6 +361,7 @@ export const seedMockData = (): Paciente[] => {
       indicacao,
       modalidade,
       agendamentos,
+      pagamentos,
       observacoes: i % 4 === 0 ? OBS[i % OBS.length] : "",
       criadoEm,
     };

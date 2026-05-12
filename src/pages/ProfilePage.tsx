@@ -5,6 +5,7 @@ import { usePatients } from "../store/usePatients";
 import { useToast } from "../components/useToast";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { PatientForm } from "../components/PatientForm";
+import { PaymentsSection } from "../components/PaymentsSection";
 import {
   calcAge,
   formatCurrency,
@@ -334,6 +335,8 @@ export function ProfilePage() {
           </div>
         )}
       </div>
+
+      <PaymentsSection patient={patient} />
 
       <ConfirmDialog
         open={pendingDelete}

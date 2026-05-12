@@ -1,11 +1,10 @@
 import { useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { usePatients } from "../store/usePatients";
-import {
-  formatCurrency,
-  initials,
-} from "../lib/format";
+import { formatCurrency, initials } from "../lib/format";
 import { minutesToTime, timeToMinutes } from "../lib/time";
+import { collectPendingPayments, monthRange } from "../lib/payments";
+import { startOfDay } from "../lib/calendar";
 import type { Modalidade, Paciente } from "../types/patient";
 
 interface TodayEvent {
@@ -73,10 +72,13 @@ export function HomePage() {
     return sum + valor * sessoes;
   }, 0);
 
-  const recent = patients
-    .slice()
-    .sort((a, b) => (b.criadoEm || "").localeCompare(a.criadoEm || ""))
-    .slice(0, 5);
+  const pendingThisMonth = useMemo(() => {
+    const today = startOfDay(new Date());
+    const { from } = monthRange(today);
+    return collectPendingPayments(patients, from, today);
+  }, [patients]);
+  const pendingCount = pendingThisMonth.length;
+  const pendingTotal = pendingThisMonth.reduce((sum, p) => sum + p.row.valor, 0);
 
   return (
     <>
@@ -110,136 +112,83 @@ export function HomePage() {
           <div className="label">Receita / semana</div>
           <div className="value">{formatCurrency(receitaSemana)}</div>
         </div>
+        <button
+          type="button"
+          className={"stat-card clickable" + (pendingCount > 0 ? " warn" : "")}
+          onClick={() => navigate("/pagamentos/pendentes")}
+          aria-label="Ver pagamentos pendentes"
+        >
+          <div className="label">Pagamentos pendentes</div>
+          <div className="value">{pendingCount}</div>
+          <div className="stat-sub">{formatCurrency(pendingTotal)}</div>
+        </button>
       </div>
 
-      <div className="home-grid">
-        <div className="card">
-          <div className="card-header">
-            <div className="card-header-text">
-              <h2>Atendimentos de hoje</h2>
-              <p>Clique em um paciente para abrir o perfil.</p>
-            </div>
-            <div className="card-header-actions">
-              <button
-                type="button"
-                className="btn btn-secondary btn-icon"
-                onClick={() => navigate("/agenda")}
-              >
-                Ver agenda
-              </button>
-            </div>
+      <div className="card">
+        <div className="card-header">
+          <div className="card-header-text">
+            <h2>Atendimentos de hoje</h2>
+            <p>Clique em um paciente para abrir o perfil.</p>
           </div>
-
-          {todayEvents.length === 0 ? (
-            <div className="today-empty">
-              <strong>Nenhum atendimento agendado para hoje.</strong>
-              <span>Aproveite o tempo livre ou veja a semana completa na agenda.</span>
-            </div>
-          ) : (
-            <div className="today-list">
-              {todayEvents.map((ev, i) => {
-                const ini = timeToMinutes(ev.horario);
-                const fimMin = ini + Number(ev.duracao);
-                const fim = minutesToTime(fimMin);
-                const cls = ["today-item"];
-                if (fimMin < nowMinutes) cls.push("is-past");
-                else if (ini <= nowMinutes && nowMinutes < fimMin) cls.push("is-now");
-
-                return (
-                  <button
-                    type="button"
-                    key={`${ev.patient.id}-${i}`}
-                    className={cls.join(" ")}
-                    onClick={() => navigate(`/pacientes/${ev.patient.id}`)}
-                  >
-                    <div className="today-time">{ev.horario}</div>
-                    <div className="avatar">{initials(ev.patient.nome)}</div>
-                    <div className="today-info">
-                      <div className="today-name">{ev.patient.nome}</div>
-                      <div className="today-meta">
-                        <span>
-                          {ev.horario} – {fim}
-                        </span>
-                        <span className="meta-sep">·</span>
-                        <span>{ev.duracao} min</span>
-                        {ev.modalidade && (
-                          <>
-                            <span className="meta-sep">·</span>
-                            <span>{ev.modalidade}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          <div className="card-header-actions">
+            <button
+              type="button"
+              className="btn btn-accent btn-icon"
+              onClick={() => navigate("/agenda")}
+            >
+              Ver agenda
+            </button>
+          </div>
         </div>
 
-        <aside className="home-side">
-          <div className="card">
-            <div className="card-header">
-              <div className="card-header-text">
-                <h2>Atalhos</h2>
-              </div>
-            </div>
-            <div className="quick-actions">
-              <Link to="/pacientes/novo" className="quick-btn">
-                <span className="quick-icon">+</span>
-                <span className="quick-btn-text">
-                  <span className="quick-title">Novo paciente</span>
-                  <span className="quick-sub">Cadastrar um novo paciente</span>
-                </span>
-              </Link>
-              <Link to="/pacientes" className="quick-btn">
-                <span className="quick-icon">≡</span>
-                <span className="quick-btn-text">
-                  <span className="quick-title">Ver pacientes</span>
-                  <span className="quick-sub">Buscar e gerenciar a base</span>
-                </span>
-              </Link>
-              <Link to="/agenda" className="quick-btn">
-                <span className="quick-icon">▦</span>
-                <span className="quick-btn-text">
-                  <span className="quick-title">Ver agenda</span>
-                  <span className="quick-sub">Semana completa</span>
-                </span>
-              </Link>
-            </div>
+        {todayEvents.length === 0 ? (
+          <div className="today-empty">
+            <strong>Nenhum atendimento agendado para hoje.</strong>
+            <span>
+              Aproveite o tempo livre ou veja a semana completa na agenda.
+            </span>
           </div>
+        ) : (
+          <div className="today-list">
+            {todayEvents.map((ev, i) => {
+              const ini = timeToMinutes(ev.horario);
+              const fimMin = ini + Number(ev.duracao);
+              const fim = minutesToTime(fimMin);
+              const cls = ["today-item"];
+              if (fimMin < nowMinutes) cls.push("is-past");
+              else if (ini <= nowMinutes && nowMinutes < fimMin)
+                cls.push("is-now");
 
-          <div className="card">
-            <div className="card-header">
-              <div className="card-header-text">
-                <h2>Cadastros recentes</h2>
-              </div>
-            </div>
-            {recent.length === 0 ? (
-              <div className="recent-empty">Nenhum paciente cadastrado ainda.</div>
-            ) : (
-              <div className="recent-list">
-                {recent.map((p) => (
-                  <button
-                    type="button"
-                    key={p.id}
-                    className="recent-item"
-                    onClick={() => navigate(`/pacientes/${p.id}`)}
-                  >
-                    <div className="avatar">{initials(p.nome)}</div>
-                    <div className="recent-text">
-                      <div className="recent-name">{p.nome}</div>
-                      <div className="recent-meta">
-                        {p.tipoPaciente}
-                        {p.modalidade ? ` · ${p.modalidade}` : ""}
-                      </div>
+              return (
+                <button
+                  type="button"
+                  key={`${ev.patient.id}-${i}`}
+                  className={cls.join(" ")}
+                  onClick={() => navigate(`/pacientes/${ev.patient.id}`)}
+                >
+                  <div className="today-time">{ev.horario}</div>
+                  <div className="avatar">{initials(ev.patient.nome)}</div>
+                  <div className="today-info">
+                    <div className="today-name">{ev.patient.nome}</div>
+                    <div className="today-meta">
+                      <span>
+                        {ev.horario} – {fim}
+                      </span>
+                      <span className="meta-sep">·</span>
+                      <span>{ev.duracao} min</span>
+                      {ev.modalidade && (
+                        <>
+                          <span className="meta-sep">·</span>
+                          <span>{ev.modalidade}</span>
+                        </>
+                      )}
                     </div>
-                  </button>
-                ))}
-              </div>
-            )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
-        </aside>
+        )}
       </div>
     </>
   );

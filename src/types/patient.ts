@@ -13,6 +13,30 @@ export interface Agendamento {
   modalidade?: Modalidade; // modalidade individual; se ausente, herda a do paciente
 }
 
+export type StatusPagamento = "Pago" | "Pendente";
+
+export type MetodoPagamento =
+  | "PIX"
+  | "Dinheiro"
+  | "Cartão"
+  | "Transferência"
+  | "Boleto"
+  | "Outro";
+
+export interface Pagamento {
+  id: string;
+  /** Data da sessão (ISO yyyy-mm-dd). Junto com `horario` identifica unicamente. */
+  data: string;
+  horario: string; // "HH:mm"
+  /** Valor cobrado naquela sessão. Pode diferir do valorSessao do paciente. */
+  valor: number;
+  status: StatusPagamento;
+  /** Timestamp em que foi marcado como pago. */
+  pagoEm?: string;
+  metodo?: MetodoPagamento;
+  observacao?: string;
+}
+
 export interface Paciente {
   id: string;
 
@@ -46,6 +70,7 @@ export interface Paciente {
   indicacao: string;
   modalidade: Modalidade;
   agendamentos: Agendamento[];
+  pagamentos?: Pagamento[];
   observacoes?: string;
 
   // Metadata

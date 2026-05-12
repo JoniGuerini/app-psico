@@ -215,7 +215,7 @@ export function Select<T extends string | number>({
                 theme: "os-theme-warm",
                 autoHide: "never",
               },
-              overflow: { x: "hidden", y: "scroll" },
+              overflow: { x: "hidden" },
             }}
             defer
           >
